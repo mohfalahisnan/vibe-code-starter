@@ -1,0 +1,107 @@
+{
+  "version": 1,
+  "template": {
+    "name": "vibe-code-starter",
+    "description": "A vibe-coding starter template that bootstraps a curated set of Claude Code / Codex plugins, skills, and brand identity on first load.",
+    "docs": "See setup.md (runbook) and .claude/README.md (config docs)."
+  },
+  "targets": ["claude-code", "codex"],
+
+  "marketplaces": [
+    {
+      "name": "vibe-code-starter",
+      "type": "local",
+      "source": ".",
+      "manifest": ".claude-plugin/marketplace.json",
+      "description": "Local marketplace bundling the plugins vendored under .claude/plugins/ in this repo. Self-contained, installs offline.",
+      "add": "claude plugin marketplace add ."
+    },
+    {
+      "name": "karimo",
+      "type": "github",
+      "source": "opensesh/KARIMO",
+      "description": "KARIMO agent-orchestration plugin marketplace (external, GitHub).",
+      "add": "claude plugin marketplace add opensesh/KARIMO"
+    }
+  ],
+
+  "plugins": {
+    "_note": "Plugins under .claude/plugins/ are INERT until installed from a marketplace. Install at user scope. Health check: `claude plugin list --json`.",
+    "required": [
+      { "name": "agent-sdk-dev", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/agent-sdk-dev" },
+      { "name": "code-review", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/code-review" },
+      { "name": "commit-commands", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/commit-commands" },
+      { "name": "feature-dev", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/feature-dev" },
+      { "name": "hookify", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/hookify" },
+      { "name": "plugin-dev", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/plugin-dev" },
+      { "name": "karimo", "marketplace": "karimo", "vendored": null }
+    ],
+    "optional": [
+      { "name": "ralph-wiggum", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/ralph-wiggum", "aliases": ["ralph-wiggun"] },
+      { "name": "pr-review-toolkit", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/pr-review-toolkit" }
+    ]
+  },
+
+  "outputStyles": {
+    "_note": "Delivered as skills-dir plugins (they have .claude-plugin/plugin.json + hooks under .claude/skills/). They auto-load once the workspace is trusted and plugins are reloaded — no marketplace install required.",
+    "required": [
+      { "name": "learning-output-style", "delivery": "skills-dir", "path": ".claude/skills/learning-output-style" }
+    ],
+    "optional": [
+      { "name": "explanatory-output-style", "delivery": "skills-dir", "path": ".claude/skills/explanatory-output-style" }
+    ]
+  },
+
+  "skills": {
+    "_note": "True SKILL.md skills under .claude/skills/ auto-load at project scope once the workspace is trusted. No install needed; verify presence + load.",
+    "path": ".claude/skills",
+    "delivery": "project-auto-load",
+    "required": [
+      "bos-code-quality",
+      "brand-guidelines",
+      "frontend-design",
+      "incremental-commits",
+      "security-guidance",
+      "subagent-driven-development",
+      "systematic-debugging",
+      "verification-before-completion",
+      "writing-plans"
+    ]
+  },
+
+  "brand": {
+    "_note": "brand-guidelines ships as a placeholder template. setup.md interviews the user and fills in the skill + brand docs for THEIR brand, then flips configured=true.",
+    "configured": false,
+    "skill": ".claude/skills/brand-guidelines/SKILL.md",
+    "docs": ".claude/brand",
+    "identity": {
+      "companyName": null,
+      "tagline": null,
+      "colors": {
+        "primary": null,
+        "background": null,
+        "accent": null,
+        "_ratio": "primary + background ~45-50% each; accent MAX 10% of composition"
+      },
+      "typography": { "display": null, "body": null, "mono": null },
+      "tone": null
+    }
+  },
+
+  "files": {
+    "setupRunbook": "setup.md",
+    "claudeMd": "CLAUDE.md",
+    "agentsMd": "AGENTS.md",
+    "configDoc": ".claude/README.md",
+    "config": ".claude/setup.config.json",
+    "marketplaceManifest": ".claude-plugin/marketplace.json"
+  },
+
+  "state": {
+    "_note": "setup.md updates these flags as it completes each phase so re-runs are idempotent.",
+    "setupCompleted": false,
+    "pluginsInstalled": false,
+    "brandConfigured": false,
+    "guidesInitialized": false
+  }
+}

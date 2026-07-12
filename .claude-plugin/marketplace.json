@@ -1,0 +1,52 @@
+{
+  "name": "vibe-code-starter",
+  "owner": {
+    "name": "Vibe Code Starter"
+  },
+  "metadata": {
+    "description": "Local marketplace bundling the plugins vendored in this starter template.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "agent-sdk-dev",
+      "source": "./.claude/plugins/agent-sdk-dev",
+      "description": "Build Claude Agent SDK applications with guided scaffolding."
+    },
+    {
+      "name": "code-review",
+      "source": "./.claude/plugins/code-review",
+      "description": "Structured code review workflow."
+    },
+    {
+      "name": "commit-commands",
+      "source": "./.claude/plugins/commit-commands",
+      "description": "Conventional commit and git workflow helpers."
+    },
+    {
+      "name": "feature-dev",
+      "source": "./.claude/plugins/feature-dev",
+      "description": "End-to-end feature development workflow with specialized agents."
+    },
+    {
+      "name": "hookify",
+      "source": "./.claude/plugins/hookify",
+      "description": "Create hooks and guardrails from conversation patterns."
+    },
+    {
+      "name": "plugin-dev",
+      "source": "./.claude/plugins/plugin-dev",
+      "description": "Build and validate your own Claude Code plugins."
+    },
+    {
+      "name": "pr-review-toolkit",
+      "source": "./.claude/plugins/pr-review-toolkit",
+      "description": "Multi-agent pull request review toolkit."
+    },
+    {
+      "name": "ralph-wiggum",
+      "source": "./.claude/plugins/ralph-wiggum",
+      "description": "Continuous self-referential AI loops for iterative development."
+    }
+  ]
+}
