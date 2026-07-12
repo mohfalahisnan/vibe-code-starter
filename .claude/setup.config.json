@@ -22,6 +22,13 @@
       "source": "opensesh/KARIMO",
       "description": "KARIMO agent-orchestration plugin marketplace (external, GitHub).",
       "add": "claude plugin marketplace add opensesh/KARIMO"
+    },
+    {
+      "name": "ponytail",
+      "type": "github",
+      "source": "DietrichGebert/ponytail",
+      "description": "Ponytail marketplace — 'lazy senior dev' skill that forces minimal solutions (YAGNI, stdlib-first) to cut code + tokens.",
+      "add": "claude plugin marketplace add DietrichGebert/ponytail"
     }
   ],
 
@@ -38,8 +45,44 @@
     ],
     "optional": [
       { "name": "ralph-wiggum", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/ralph-wiggum", "aliases": ["ralph-wiggun"] },
-      { "name": "pr-review-toolkit", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/pr-review-toolkit" }
+      { "name": "pr-review-toolkit", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/pr-review-toolkit" },
+      { "name": "ponytail", "marketplace": "ponytail", "vendored": null, "purpose": "token-efficiency", "install": "claude plugin install ponytail@ponytail", "requires": "node on PATH (for the activation hook)" }
     ]
+  },
+
+  "optionalTools": {
+    "_note": "External CLI tools (NOT Claude Code marketplace plugins) that reduce token usage. setup.md offers each with its description and installs only if the user opts in. Check platform support (Homebrew/uv/node) first.",
+    "rtk": {
+      "name": "rtk",
+      "aka": "Rust Token Killer",
+      "repo": "rtk-ai/rtk",
+      "purpose": "CLI proxy that filters/compresses command output (ls/cat/grep/git/test runners) before it reaches the model — 60-90% fewer tokens from tool output, <10ms overhead.",
+      "integration": "hook (rtk hook claude)",
+      "install": {
+        "homebrew": "brew install rtk",
+        "script": "curl -fsSL https://raw.githubusercontent.com/rtk-ai/rtk/refs/heads/master/install.sh | sh",
+        "cargo": "cargo install --git https://github.com/rtk-ai/rtk",
+        "windowsBinary": "Download rtk-x86_64-pc-windows-msvc.zip from the repo Releases; put rtk.exe on PATH.",
+        "postInstall": "rtk hook claude   (register the Claude Code hook; see repo INSTALL.md)"
+      },
+      "healthCheck": "rtk --version && rtk gain",
+      "recommends": "ripgrep (rg) on PATH for filters",
+      "notes": "Name collision: rtk-ai/rtk is the Token Killer; reachingforthejack/rtk is a DIFFERENT project. NEVER `cargo install rtk` from crates.io — use `cargo install --git`."
+    },
+    "graphify": {
+      "name": "graphify",
+      "repo": "Graphify-Labs/graphify",
+      "package": "graphifyy",
+      "purpose": "Maps the whole project into a queryable knowledge graph (code via tree-sitter AST, fully local; docs/PDFs/images via the model). Query/trace/explain instead of grepping — cuts exploration tokens.",
+      "integration": "cli + registered skill (/graphify)",
+      "install": {
+        "uv": "uv tool install graphifyy",
+        "pipx": "pipx install graphifyy",
+        "register": "graphify install"
+      },
+      "healthCheck": "graphify --version",
+      "usage": "/graphify .  → writes graphify-out/{graph.html, GRAPH_REPORT.md, graph.json}"
+    }
   },
 
   "outputStyles": {

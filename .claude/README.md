@@ -31,7 +31,18 @@ and installs them by name.
 
 **Required:** `agent-sdk-dev` · `code-review` · `commit-commands` · `feature-dev` ·
 `hookify` · `plugin-dev` · `karimo` *(from `opensesh/KARIMO`)*
-**Optional:** `ralph-wiggum` · `pr-review-toolkit`
+**Optional:** `ralph-wiggum` · `pr-review-toolkit` · `ponytail` *(token-efficiency; from `DietrichGebert/ponytail`)*
+
+### Optional token-efficiency tools  → external CLIs (not plugins)
+
+Declared in `setup.config.json → optionalTools`. These are **not** Claude Code plugins —
+they install via Homebrew / `uv` and integrate through hooks or a registered skill. Setup
+offers each and installs only if you opt in.
+
+- **rtk** (`rtk-ai/rtk`, "Rust Token Killer") — proxy that compresses command output before
+  it reaches the model (60-90% fewer tokens from tool output). Integrates via hooks.
+- **graphify** (`Graphify-Labs/graphify`) — maps the project into a queryable knowledge
+  graph (`/graphify .`) so the agent queries it instead of grepping files.
 
 ### Skills  → auto-load at project scope
 

@@ -20,14 +20,27 @@ and updates the `state` flags in the config when it finishes.
 
 ## Ground rules for the agent
 
-1. **Ask before every side effect.** Installing plugins, adding marketplaces, and
-   editing standing config all require the user's explicit approval. Present the
-   exact command, wait for a clear "yes", then run it. Never install silently.
-2. **Read `.claude/setup.config.json` first** and treat its `required` / `optional`
+**This template is for "vibe coders" — assume the user may not know how to code.** Do the
+work *for* them. Don't hand them a list of commands to paste; **you run every command
+yourself**, explain in plain language what each step does and why, verify it worked, and
+fix failures without making them debug. Ask for a plain-language **"yes, go ahead"** at
+each side-effecting step — not for command syntax.
+
+1. **Get consent, then do it yourself.** Installing plugins/tools, adding marketplaces,
+   and editing standing config need a clear "yes". Say what you're about to install and
+   what it does, wait for yes, **then run the command yourself**. Never install silently.
+2. **Offer bypass-permissions mode for a smooth install.** A non-technical user will hit
+   many approval prompts across a multi-tool install. Offer to let them switch Claude Code
+   into **bypass-permissions mode** (cycle modes with **Shift+Tab**, or launch with
+   `claude --dangerously-skip-permissions`) so you can install without a prompt on every
+   command. Explain plainly: it lets you run install commands without asking each time,
+   it's their choice, and they can switch back (Shift+Tab) the moment setup is done. If
+   they decline, proceed with per-command approvals — never pressure them.
+3. **Read `.claude/setup.config.json` first** and treat its `required` / `optional`
    lists as authoritative. If this runbook and the config ever disagree, the config wins.
-3. **Report, don't assume.** After each phase, show the user what changed and what is
+4. **Report, don't assume.** After each phase, show the user what changed and what is
    still missing. Do not claim success without running the verification command.
-4. **Codex users:** you have no plugin marketplace. Do Phase 3–6 only, and read the
+5. **Codex users:** you have no plugin marketplace. Do Phase 3–6 only, and read the
    [Codex notes](#codex-notes) at the end.
 
 ---
@@ -75,8 +88,14 @@ ls .claude/skills
 ```
 Skills auto-load at project scope, so "present + workspace trusted" = healthy.
 
+**Optional tools** (`config.optionalTools`) — external CLIs, check presence only:
+```bash
+rtk --version 2>/dev/null; graphify --version 2>/dev/null
+```
+
 Present a single **health report** (✔ ok / ⚠ disabled / ✘ missing) covering marketplaces,
-required plugins, optional plugins, output styles, and required skills. Then move on.
+required plugins, optional plugins, output styles, required skills, and optional tools.
+Then move on.
 
 ---
 
@@ -115,11 +134,15 @@ claude plugin install karimo@karimo
 
 ### 2c. Offer optional plugins
 
-List `config.plugins.optional[]` and let the user pick. Install only what they choose:
+List `config.plugins.optional[]` with descriptions and let the user pick. Install only
+what they choose. **ponytail** lives on its own marketplace — add it first (2a) if chosen:
 
 ```bash
 claude plugin install ralph-wiggum@vibe-code-starter
 claude plugin install pr-review-toolkit@vibe-code-starter
+# ponytail (token-efficiency; needs `node` on PATH) — from the DietrichGebert/ponytail marketplace
+claude plugin marketplace add DietrichGebert/ponytail
+claude plugin install ponytail@ponytail
 ```
 
 ### 2d. Apply & verify
@@ -130,6 +153,46 @@ re-run `claude plugin list` and confirm every required plugin is **enabled**. Se
 
 > If a `claude plugin install` fails, do **not** retry blindly. Report the error,
 > check `claude plugin marketplace list`, and confirm the marketplace was added first.
+
+### 2e. Offer token-efficiency tools (optional, EXTERNAL)
+
+`config.optionalTools` are **external CLIs, not Claude Code plugins**. **Offer each with
+a plain-language description; install only what the user opts into — and install it FOR
+them** (detect the platform, pick the method that works, run it, verify). First check
+what's already present and pick accordingly:
+```bash
+rtk --version 2>/dev/null; graphify --version 2>/dev/null   # already installed?
+uv --version; node --version; cargo --version               # what installers exist?
+```
+
+- **rtk** (Rust Token Killer, `rtk-ai/rtk`) — a proxy that compresses command output
+  before it reaches the model (60-90% fewer tokens from tool output). Integrates via a
+  hook. Pick by platform:
+  ```bash
+  # macOS / Linux:
+  brew install rtk
+  # OR (any OS with Rust toolchain — e.g. Windows):
+  cargo install --git https://github.com/rtk-ai/rtk
+  # Windows without Rust: download rtk-x86_64-pc-windows-msvc.zip from the repo's
+  #   Releases and put rtk.exe on PATH.
+  rtk --version && rtk gain          # verify (rtk gain must work → correct package)
+  ```
+  ⚠️ **Never** `cargo install rtk` from crates.io (that's a different project). Use
+  `--git`. After install, register the hook per the repo's INSTALL.md (`rtk hook claude`),
+  and put `ripgrep` (`rg`) on PATH so its filters work.
+
+- **graphify** (`Graphify-Labs/graphify`) — maps the project into a queryable knowledge
+  graph so the agent queries it instead of grepping files.
+  ```bash
+  uv tool install graphifyy   # or: pipx install graphifyy
+  graphify install            # registers the /graphify skill
+  graphify --version
+  ```
+  Then `/graphify .` builds `graphify-out/{graph.html, GRAPH_REPORT.md, graph.json}`.
+
+Do not auto-install these silently — they pull external toolchains. But once the user
+says yes, **run the install yourself**, verify with the health-check, and troubleshoot
+failures. Record which the user accepted; note skipped ones in the final report.
 
 ---
 
@@ -223,6 +286,10 @@ Codex has **no plugin marketplace**. For Codex:
 | List marketplaces | `claude plugin marketplace list` |
 | Add local marketplace | `claude plugin marketplace add .` |
 | Add KARIMO marketplace | `claude plugin marketplace add opensesh/KARIMO` |
+| Add ponytail marketplace | `claude plugin marketplace add DietrichGebert/ponytail` |
+| Install ponytail (token-eff.) | `claude plugin install ponytail@ponytail` |
+| Install rtk (token-eff., external) | `brew install rtk` (see repo INSTALL.md on Windows) |
+| Install graphify (external) | `uv tool install graphifyy && graphify install` |
 | List installed plugins | `claude plugin list --json` |
 | Install a plugin | `claude plugin install <name>@<marketplace>` |
 | Enable / disable | `claude plugin enable <name>` · `claude plugin disable <name>` |
