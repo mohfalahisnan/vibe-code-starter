@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en" data-lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Vibe Code Starter — Guide</title>
+<script>document.documentElement.setAttribute('data-lang',(function(){try{return localStorage.getItem('lang')||'en'}catch(e){return 'en'}})());</script>
+<style>
+  :root{
+    --paper:#f6f3ee; --paper-2:#efeae1; --card:#fffdf9;
+    --ink:#242320; --ink-2:#524e46; --ink-3:#8a8477;
+    --line:rgba(36,35,32,.12); --line-2:rgba(36,35,32,.06);
+    --accent:#a8552e; --accent-soft:rgba(168,85,46,.10);
+    --ok:#3f6b4a; --ok-soft:rgba(63,107,74,.12);
+    --opt:#6a5aa0; --opt-soft:rgba(106,90,160,.12);
+    --shadow:0 1px 2px rgba(36,35,32,.05),0 6px 20px rgba(36,35,32,.07);
+    --mono:ui-monospace,"SF Mono",SFMono-Regular,"Cascadia Code",Menlo,Consolas,monospace;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --paper:#1b1a17; --paper-2:#211f1b; --card:#242220;
+      --ink:#ece7dd; --ink-2:#b6afa2; --ink-3:#837c6f;
+      --line:rgba(236,231,221,.14); --line-2:rgba(236,231,221,.06);
+      --card:#242220; --accent:#d98a5c; --accent-soft:rgba(217,138,92,.12);
+      --ok:#7fb488; --ok-soft:rgba(127,180,136,.14);
+      --opt:#a99add; --opt-soft:rgba(169,154,221,.14);
+      --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+    line-height:1.6;font-size:16px;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 24px}
+  code,kbd{font-family:var(--mono);font-size:.86em}
+  code{background:var(--paper-2);border:1px solid var(--line-2);border-radius:6px;
+    padding:.12em .4em;color:var(--ink);white-space:nowrap}
+  a{color:var(--accent);text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* i18n */
+  :root[data-lang="en"] .lang-id{display:none}
+  :root[data-lang="id"] .lang-en{display:none}
+
+  /* Language switcher */
+  .langsw{margin-left:auto;display:inline-flex;gap:2px;background:var(--paper-2);
+    border:1px solid var(--line);border-radius:9px;padding:2px}
+  .langsw button{border:0;background:transparent;color:var(--ink-3);cursor:pointer;
+    font-family:var(--mono);font-size:12px;font-weight:600;padding:4px 11px;border-radius:7px;
+    transition:background .15s,color .15s}
+  .langsw button:hover{color:var(--ink)}
+  :root[data-lang="en"] .langsw [data-set-lang="en"],
+  :root[data-lang="id"] .langsw [data-set-lang="id"]{background:var(--card);color:var(--accent);
+    box-shadow:var(--shadow)}
+
+  /* Hero */
+  header.hero{padding:72px 0 48px;border-bottom:1px solid var(--line)}
+  .eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--accent);margin:0 0 16px}
+  h1{font-size:clamp(34px,6vw,54px);line-height:1.05;margin:0 0 18px;letter-spacing:-.02em}
+  .lede{font-size:clamp(17px,2.4vw,21px);color:var(--ink-2);max-width:60ch;margin:0}
+  .hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:28px}
+  .pill{font-family:var(--mono);font-size:12px;padding:6px 12px;border-radius:999px;
+    border:1px solid var(--line);background:var(--card);color:var(--ink-2)}
+
+  /* Nav */
+  nav.toc{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--paper) 88%,transparent);
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0}
+  nav.toc .wrap{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  nav.toc a{font-size:13px;color:var(--ink-2);padding:5px 11px;border-radius:8px}
+  nav.toc a:hover{background:var(--paper-2);text-decoration:none;color:var(--ink)}
+
+  section{padding:56px 0;border-bottom:1px solid var(--line-2)}
+  h2{font-size:clamp(24px,3.5vw,32px);margin:0 0 6px;letter-spacing:-.01em}
+  h2 .num{font-family:var(--mono);font-size:.55em;color:var(--accent);margin-right:12px;
+    vertical-align:middle}
+  .section-lede{color:var(--ink-2);max-width:66ch;margin:0 0 30px}
+  h3{font-size:19px;margin:34px 0 10px}
+
+  /* Badges */
+  .badge{display:inline-block;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+    text-transform:uppercase;padding:3px 8px;border-radius:6px;vertical-align:middle}
+  .b-req{background:var(--ok-soft);color:var(--ok)}
+  .b-opt{background:var(--opt-soft);color:var(--opt)}
+  .b-inst{background:var(--accent-soft);color:var(--accent)}
+  .b-avail{background:var(--paper-2);color:var(--ink-3);border:1px solid var(--line-2)}
+
+  /* Cards */
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:18px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;
+    padding:22px;box-shadow:var(--shadow);transition:transform .18s ease,box-shadow .18s ease}
+  .card:hover{transform:translateY(-2px);
+    box-shadow:0 2px 6px rgba(36,35,32,.08),0 14px 34px rgba(36,35,32,.12)}
+  .card h4{margin:0 0 4px;font-size:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .card .fn{font-family:var(--mono);font-size:12px;color:var(--ink-3);margin:0 0 12px}
+  .card p{margin:0 0 12px;color:var(--ink-2);font-size:14.5px}
+  .card ul{margin:0 0 12px;padding-left:18px;color:var(--ink-2);font-size:14px}
+  .card ul li{margin:4px 0}
+  .card .cmds{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+  .card .cmds code{font-size:12px;white-space:nowrap}
+  .kv{font-size:12.5px;color:var(--ink-3);border-top:1px solid var(--line-2);
+    padding-top:10px;margin-top:12px}
+  .kv b{color:var(--ink-2);font-weight:600}
+
+  /* Steps */
+  .steps{counter-reset:step;display:grid;gap:14px}
+  .step{background:var(--card);border:1px solid var(--line);border-radius:14px;
+    padding:18px 20px 18px 60px;position:relative;box-shadow:var(--shadow)}
+  .step::before{counter-increment:step;content:counter(step);position:absolute;
+    left:16px;top:18px;width:30px;height:30px;border-radius:9px;background:var(--accent-soft);
+    color:var(--accent);font-family:var(--mono);font-weight:700;font-size:14px;
+    display:grid;place-items:center}
+  .step h4{margin:0 0 4px;font-size:16px}
+  .step p{margin:0;color:var(--ink-2);font-size:14.5px}
+
+  /* Simple list rows */
+  .rows{display:grid;gap:10px}
+  .row{display:flex;gap:14px;align-items:baseline;background:var(--card);
+    border:1px solid var(--line);border-radius:12px;padding:14px 18px}
+  .row .name{font-weight:600;min-width:200px}
+  .row .desc{color:var(--ink-2);font-size:14.5px}
+  @media(max-width:620px){.row{flex-direction:column;gap:4px}.row .name{min-width:0}}
+
+  .callout{background:var(--accent-soft);border:1px solid var(--line);
+    border-left:3px solid var(--accent);border-radius:12px;padding:16px 20px;
+    color:var(--ink-2);font-size:14.5px;margin-top:24px}
+  .callout b{color:var(--ink)}
+
+  /* Tabs (CSS-only, radio-driven) */
+  .tabs > input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+  .tablist{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:26px;
+    border-bottom:1px solid var(--line)}
+  .tablist label{cursor:pointer;font-size:14.5px;font-weight:600;color:var(--ink-3);
+    padding:11px 16px;border-radius:10px 10px 0 0;border:1px solid transparent;border-bottom:none;
+    display:inline-flex;align-items:center;gap:8px;transition:color .15s,background .15s}
+  .tablist label:hover{color:var(--ink-2);background:var(--paper-2)}
+  .tablist .tnum{font-family:var(--mono);font-size:11px;opacity:.7}
+  .tabs > input:focus-visible + .tablist label{outline:2px solid var(--accent);outline-offset:2px}
+  .panel{display:none}
+  #wf-loop:checked ~ .tablist label[for="wf-loop"],
+  #wf-karimo:checked ~ .tablist label[for="wf-karimo"],
+  #wf-hook:checked ~ .tablist label[for="wf-hook"]{color:var(--accent);
+    border-color:var(--line);background:var(--card);box-shadow:0 2px 0 var(--accent) inset}
+  #wf-loop:checked ~ #p-loop,
+  #wf-karimo:checked ~ #p-karimo,
+  #wf-hook:checked ~ #p-hook{display:block}
+  .panel-note{color:var(--ink-2);font-size:15px;max-width:66ch;margin:0 0 24px}
+  .panel-note b{color:var(--ink)}
+
+  /* Timeline */
+  .timeline{position:relative;margin-top:8px;padding-left:8px}
+  .timeline::before{content:"";position:absolute;left:23px;top:12px;bottom:46px;width:2px;
+    background:linear-gradient(var(--accent),var(--line))}
+  .tnode{position:relative;padding:0 0 26px 62px;min-height:44px}
+  .tnode:last-child{padding-bottom:0}
+  .tdot{position:absolute;left:8px;top:2px;width:32px;height:32px;border-radius:50%;
+    background:var(--card);border:2px solid var(--accent);color:var(--accent);
+    display:grid;place-items:center;font-size:15px;box-shadow:var(--shadow);z-index:1}
+  .tnode.loop .tdot{border-style:dashed;border-color:var(--ink-3);color:var(--ink-3)}
+  .tphase{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--ink-3);margin:0 0 2px}
+  .tnode h4{margin:0 0 6px;font-size:18px}
+  .tnode p{margin:0 0 10px;color:var(--ink-2);font-size:14.5px;max-width:64ch}
+  .ttags{display:flex;flex-wrap:wrap;gap:6px}
+  .ttag{font-family:var(--mono);font-size:11.5px;padding:3px 9px;border-radius:7px;
+    border:1px solid var(--line);background:var(--card);color:var(--ink-2);white-space:nowrap}
+  .ttag.skill{background:var(--opt-soft);color:var(--opt);border-color:transparent}
+  .ttag.cmd{background:var(--accent-soft);color:var(--accent);border-color:transparent}
+
+  footer{padding:44px 0 64px;color:var(--ink-3);font-size:13.5px}
+  footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow"><span class="lang-en">Claude Code · Codex — Starter Template</span><span class="lang-id">Claude Code · Codex — Template Starter</span></p>
+    <h1>Vibe Code Starter</h1>
+    <p class="lede">
+      <span class="lang-en">A brand-neutral starter template that hands your AI coding assistant a
+        curated toolkit — plugins, skills, and design-system templates — plus a runbook it follows to
+        set everything up <em>for</em> you. You bring the idea; the agent wires up the workshop.</span>
+      <span class="lang-id">Template starter yang netral-merek dan menyerahkan perangkat siap-pakai ke
+        asisten coding AI kamu — plugin, skill, dan template design-system — plus runbook yang diikutinya
+        untuk menyiapkan semuanya <em>untuk</em> kamu. Kamu bawa idenya; agen yang merangkai bengkelnya.</span>
+    </p>
+    <div class="hero-meta">
+      <span class="pill"><span class="lang-en">7 required plugins</span><span class="lang-id">7 plugin wajib</span></span>
+      <span class="pill"><span class="lang-en">3 optional plugins</span><span class="lang-id">3 plugin opsional</span></span>
+      <span class="pill"><span class="lang-en">10 auto-loading skills</span><span class="lang-id">10 skill auto-load</span></span>
+      <span class="pill"><span class="lang-en">2 token-saving tools</span><span class="lang-id">2 alat hemat token</span></span>
+      <span class="pill"><span class="lang-en">No coding required to set up</span><span class="lang-id">Tanpa perlu coding untuk setup</span></span>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <a href="#what"><span class="lang-en">What it is</span><span class="lang-id">Apa ini</span></a>
+    <a href="#start"><span class="lang-en">Getting started</span><span class="lang-id">Mulai</span></a>
+    <a href="#workflow"><span class="lang-en">Workflow</span><span class="lang-id">Alur kerja</span></a>
+    <a href="#plugins"><span class="lang-en">Plugins</span><span class="lang-id">Plugin</span></a>
+    <a href="#optional-plugins"><span class="lang-en">Optional plugins</span><span class="lang-id">Plugin opsional</span></a>
+    <a href="#skills"><span class="lang-en">Skills</span><span class="lang-id">Skill</span></a>
+    <a href="#styles"><span class="lang-en">Output styles</span><span class="lang-id">Gaya output</span></a>
+    <a href="#tools"><span class="lang-en">Token tools</span><span class="lang-id">Alat token</span></a>
+    <div class="langsw" role="group" aria-label="Language / Bahasa">
+      <button type="button" data-set-lang="en">EN</button>
+      <button type="button" data-set-lang="id">ID</button>
+    </div>
+  </div>
+</nav>
+
+<main>
+
+<!-- WHAT IT IS -->
+<section id="what">
+  <div class="wrap">
+    <h2><span class="num">01</span><span class="lang-en">What this starter is</span><span class="lang-id">Apa itu starter ini</span></h2>
+    <p class="section-lede">
+      <span class="lang-en">Think of it as a fully-stocked workshop that arrives flat-packed. Every drawer
+        is labelled but empty until you open it. When you first load the project, the AI agent reads a
+        setup runbook and — with your approval at each step — installs the tools, verifies them, asks
+        about your brand, and fills in the project guides.</span>
+      <span class="lang-id">Anggap saja seperti bengkel lengkap yang datang dalam kondisi flat-pack.
+        Setiap laci sudah diberi label tapi kosong sampai kamu membukanya. Saat pertama kali membuka
+        proyek, agen AI membaca runbook setup dan — dengan persetujuanmu di tiap langkah — memasang
+        alat-alatnya, memverifikasinya, menanyakan brand kamu, dan mengisi panduan proyek.</span>
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <h4>🧩 <span class="lang-en">Curated capabilities</span><span class="lang-id">Kemampuan terkurasi</span></h4>
+        <p><span class="lang-en">A hand-picked <code>.claude/</code> folder of plugins (commands +
+          specialist agents), skills (always-on know-how), and design/brand templates — chosen to cover
+          the common jobs of building software.</span>
+          <span class="lang-id">Folder <code>.claude/</code> pilihan berisi plugin (perintah + agen
+          spesialis), skill (pengetahuan yang selalu aktif), dan template design/brand — dipilih untuk
+          menutup pekerjaan umum dalam membangun software.</span></p>
+      </div>
+      <div class="card">
+        <h4>📋 <span class="lang-en">A setup runbook</span><span class="lang-id">Runbook setup</span></h4>
+        <p><span class="lang-en"><code>setup.md</code> is a phased checklist the agent follows:
+          health-check, install with your approval, verify, capture your brand, then initialize the
+          guides. Re-running it is safe — it tracks what's already done.</span>
+          <span class="lang-id"><code>setup.md</code> adalah checklist bertahap yang diikuti agen: cek
+          kondisi, pasang dengan persetujuanmu, verifikasi, rekam brand kamu, lalu inisialisasi
+          panduannya. Menjalankannya ulang aman — ia melacak apa yang sudah selesai.</span></p>
+      </div>
+      <div class="card">
+        <h4>🎨 <span class="lang-en">Brand-neutral by default</span><span class="lang-id">Netral-merek secara default</span></h4>
+        <p><span class="lang-en">Ships with no colours, fonts, or company name baked in. The setup
+          interview fills those placeholders with <em>your</em> brand, so everything the agent builds
+          looks like you.</span>
+          <span class="lang-id">Datang tanpa warna, font, atau nama perusahaan yang tertanam. Wawancara
+          setup mengisi placeholder itu dengan brand <em>kamu</em>, jadi semua yang dibangun agen
+          terlihat seperti milikmu.</span></p>
+      </div>
+      <div class="card">
+        <h4>🙋 <span class="lang-en">Built for non-coders</span><span class="lang-id">Dibuat untuk non-coder</span></h4>
+        <p><span class="lang-en">You don't install anything by hand. You describe what you want; the
+          agent does the plumbing and explains each step in plain language before acting.</span>
+          <span class="lang-id">Kamu tidak memasang apa pun secara manual. Kamu cukup menjelaskan
+          keinginanmu; agen yang mengurus teknisnya dan menjelaskan tiap langkah dengan bahasa sederhana
+          sebelum bertindak.</span></p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="lang-en"><b>Source of truth:</b> the inventory below is drawn from
+        <code>.claude/setup.config.json</code> — the authoritative manifest — and each plugin's own
+        <code>plugin.json</code>. If the config changes, that file wins.</span>
+      <span class="lang-id"><b>Sumber kebenaran:</b> daftar di bawah diambil dari
+        <code>.claude/setup.config.json</code> — manifes resmi — dan <code>plugin.json</code> milik tiap
+        plugin. Kalau config berubah, file itulah yang menang.</span>
+    </div>
+  </div>
+</section>
+
+<!-- GETTING STARTED -->
+<section id="start">
+  <div class="wrap">
+    <h2><span class="num">02</span><span class="lang-en">Getting started</span><span class="lang-id">Mulai</span></h2>
+    <p class="section-lede">
+      <span class="lang-en">On first load, if setup hasn't run yet (<code>state.setupCompleted</code> is
+        <code>false</code>), just ask the agent to <em>"follow setup.md."</em> It walks these phases,
+        pausing for your OK before anything installs.</span>
+      <span class="lang-id">Saat pertama dibuka, kalau setup belum jalan
+        (<code>state.setupCompleted</code> bernilai <code>false</code>), cukup minta agen untuk
+        <em>"ikuti setup.md."</em> Ia akan menelusuri tahap-tahap ini, berhenti menunggu persetujuanmu
+        sebelum memasang apa pun.</span>
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <h4><span class="lang-en">Health check</span><span class="lang-id">Cek kondisi</span></h4>
+        <p><span class="lang-en">The agent inspects what's already installed
+          (<code>claude plugin list</code>) so it never double-installs and knows exactly what's
+          missing.</span>
+          <span class="lang-id">Agen memeriksa apa yang sudah terpasang
+          (<code>claude plugin list</code>) supaya tidak memasang dua kali dan tahu persis apa yang
+          kurang.</span></p>
+      </div>
+      <div class="step">
+        <h4><span class="lang-en">Install plugins — with your approval</span><span class="lang-id">Pasang plugin — dengan persetujuanmu</span></h4>
+        <p><span class="lang-en">Adds the marketplaces and installs each required plugin
+          (<code>claude plugin install &lt;name&gt;@&lt;marketplace&gt;</code>). Optional external
+          token tools are offered separately, installed only if you opt in.</span>
+          <span class="lang-id">Menambahkan marketplace dan memasang tiap plugin wajib
+          (<code>claude plugin install &lt;name&gt;@&lt;marketplace&gt;</code>). Alat token eksternal
+          opsional ditawarkan terpisah, dipasang hanya kalau kamu setuju.</span></p>
+      </div>
+      <div class="step">
+        <h4><span class="lang-en">Verify</span><span class="lang-id">Verifikasi</span></h4>
+        <p><span class="lang-en">Confirms skills and output styles auto-loaded once the workspace is
+          trusted (a <code>/reload-plugins</code> refresh), so the toolkit is actually live.</span>
+          <span class="lang-id">Memastikan skill dan gaya output sudah auto-load setelah workspace
+          dipercaya (refresh <code>/reload-plugins</code>), jadi perangkatnya benar-benar aktif.</span></p>
+      </div>
+      <div class="step">
+        <h4><span class="lang-en">Brand interview</span><span class="lang-id">Wawancara brand</span></h4>
+        <p><span class="lang-en">Asks about your company name, colours, fonts, and tone, then writes them
+          into the brand skill and design tokens — flipping <code>brandConfigured</code> to true.</span>
+          <span class="lang-id">Menanyakan nama perusahaan, warna, font, dan tone kamu, lalu
+          menuliskannya ke skill brand dan design token — mengubah <code>brandConfigured</code> jadi
+          true.</span></p>
+      </div>
+      <div class="step">
+        <h4><span class="lang-en">Initialize the guides</span><span class="lang-id">Inisialisasi panduan</span></h4>
+        <p><span class="lang-en">Fills the <code>&lt;PLACEHOLDER&gt;</code> fields in <code>CLAUDE.md</code>
+          / <code>AGENTS.md</code> so every agent that opens the project reads the same, accurate
+          guide.</span>
+          <span class="lang-id">Mengisi kolom <code>&lt;PLACEHOLDER&gt;</code> di <code>CLAUDE.md</code> /
+          <code>AGENTS.md</code> supaya setiap agen yang membuka proyek membaca panduan yang sama dan
+          akurat.</span></p>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="lang-en"><b>How things install:</b> plugins come from a bundled local marketplace
+        (<code>vibe-code-starter</code>, works offline) plus two external GitHub marketplaces
+        (<code>opensesh/KARIMO</code>, <code>DietrichGebert/ponytail</code>). Skills and output styles
+        need no install — they auto-load once the workspace is trusted.</span>
+      <span class="lang-id"><b>Cara pemasangannya:</b> plugin berasal dari marketplace lokal bawaan
+        (<code>vibe-code-starter</code>, jalan offline) plus dua marketplace GitHub eksternal
+        (<code>opensesh/KARIMO</code>, <code>DietrichGebert/ponytail</code>). Skill dan gaya output tidak
+        perlu dipasang — semuanya auto-load begitu workspace dipercaya.</span>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="workflow">
+  <div class="wrap">
+    <h2><span class="num">03</span><span class="lang-en">Your vibe-coding workflow</span><span class="lang-id">Alur kerja vibe-coding kamu</span></h2>
+    <p class="section-lede">
+      <span class="lang-en">Setup happens once — then the work begins. There isn't one workflow, though:
+        there's a different one for each kind of job. Pick a tab below.</span>
+      <span class="lang-id">Setup cuma sekali — lalu pekerjaannya dimulai. Tapi alur kerjanya bukan cuma
+        satu: ada yang berbeda untuk tiap jenis pekerjaan. Pilih tab di bawah.</span>
+    </p>
+
+    <div class="tabs">
+      <input type="radio" name="wf" id="wf-loop" checked>
+      <input type="radio" name="wf" id="wf-karimo">
+      <input type="radio" name="wf" id="wf-hook">
+      <div class="tablist">
+        <label for="wf-loop"><span class="tnum">01</span><span class="lang-en">Everyday loop</span><span class="lang-id">Loop harian</span></label>
+        <label for="wf-karimo"><span class="tnum">02</span><span class="lang-en">Big projects · KARIMO</span><span class="lang-id">Proyek besar · KARIMO</span></label>
+        <label for="wf-hook"><span class="tnum">03</span><span class="lang-en">Guardrails · hookify</span><span class="lang-id">Pengaman · hookify</span></label>
+      </div>
+
+      <div class="panel" id="p-loop">
+        <p class="panel-note">
+          <span class="lang-en"><b>For most work — features, fixes, tweaks.</b> You drive small loops:
+            describe it, the agent builds it, you ship it, repeat. You mostly speak plain language; the
+            badges show which skill switches on automatically and which command you type at each stage.</span>
+          <span class="lang-id"><b>Untuk sebagian besar pekerjaan — fitur, perbaikan, penyesuaian.</b>
+            Kamu menjalankan loop kecil: jelaskan, agen membangunnya, kamu rilis, ulangi. Kamu mayoritas
+            bicara dengan bahasa biasa; badge menunjukkan skill mana yang aktif otomatis dan perintah
+            mana yang kamu ketik di tiap tahap.</span></p>
+        <div class="timeline">
+
+          <div class="tnode">
+            <div class="tdot">💡</div>
+            <p class="tphase"><span class="lang-en">Stage 1 · Describe</span><span class="lang-id">Tahap 1 · Jelaskan</span></p>
+            <h4><span class="lang-en">Say what you want</span><span class="lang-id">Sampaikan keinginanmu</span></h4>
+            <p><span class="lang-en">Tell the agent the idea in your own words — "add a login page,"
+              "make this faster." The brainstorming skill draws out the intent and requirements before
+              any code is written.</span>
+              <span class="lang-id">Ceritakan idenya dengan kata-katamu sendiri — "tambahkan halaman
+              login," "buat ini lebih cepat." Skill brainstorming menggali maksud dan kebutuhannya
+              sebelum satu baris kode pun ditulis.</span></p>
+            <div class="ttags"><span class="ttag skill">brainstorming</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">🗺️</div>
+            <p class="tphase"><span class="lang-en">Stage 2 · Plan</span><span class="lang-id">Tahap 2 · Rencana</span></p>
+            <h4><span class="lang-en">Turn the idea into a plan</span><span class="lang-id">Ubah ide jadi rencana</span></h4>
+            <p><span class="lang-en">For anything beyond a one-liner, the agent writes a short, ordered
+              plan so you can see the approach before it commits to it — no surprises halfway through.</span>
+              <span class="lang-id">Untuk hal yang lebih dari sekadar sepele, agen menulis rencana
+              singkat dan berurutan supaya kamu bisa melihat pendekatannya sebelum dijalankan — tanpa
+              kejutan di tengah jalan.</span></p>
+            <div class="ttags"><span class="ttag skill">writing-plans</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">🔍</div>
+            <p class="tphase"><span class="lang-en">Stage 3 · Understand</span><span class="lang-id">Tahap 3 · Pahami</span></p>
+            <h4><span class="lang-en">Explore the code first</span><span class="lang-id">Telusuri kode dulu</span></h4>
+            <p><span class="lang-en">Before touching anything, the agent traces how the existing pieces
+              work and where the new code belongs — reusing what's already there instead of duplicating
+              it.</span>
+              <span class="lang-id">Sebelum menyentuh apa pun, agen menelusuri cara kerja bagian yang
+              sudah ada dan di mana kode baru seharusnya berada — memakai ulang yang sudah ada alih-alih
+              menduplikasinya.</span></p>
+            <div class="ttags"><span class="ttag cmd">/feature-dev</span><span class="ttag skill">codebase-structure</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">🔨</div>
+            <p class="tphase"><span class="lang-en">Stage 4 · Build</span><span class="lang-id">Tahap 4 · Bangun</span></p>
+            <h4><span class="lang-en">Implement the change</span><span class="lang-id">Terapkan perubahannya</span></h4>
+            <p><span class="lang-en">The architect and implementer agents make the change against your
+              codebase's real patterns. If there's UI, the design and brand skills keep it looking like
+              <em>you</em>.</span>
+              <span class="lang-id">Agen arsitek dan implementer membuat perubahan sesuai pola nyata di
+              codebase kamu. Kalau ada UI, skill design dan brand menjaga tampilannya tetap seperti
+              <em>kamu</em>.</span></p>
+            <div class="ttags"><span class="ttag cmd">/feature-dev</span><span class="ttag skill">frontend-design</span><span class="ttag skill">brand-guidelines</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">✅</div>
+            <p class="tphase"><span class="lang-en">Stage 5 · Verify &amp; review</span><span class="lang-id">Tahap 5 · Verifikasi &amp; tinjau</span></p>
+            <h4><span class="lang-en">Prove it works, then review it</span><span class="lang-id">Buktikan berfungsi, lalu tinjau</span></h4>
+            <p><span class="lang-en">The agent runs the checks and confirms the output before claiming
+              it's done, then a review pass hunts for bugs and quality issues — confidence-scored so you
+              see only what matters.</span>
+              <span class="lang-id">Agen menjalankan pengecekan dan memastikan hasilnya sebelum menyatakan
+              selesai, lalu satu putaran review memburu bug dan masalah kualitas — diberi skor keyakinan
+              supaya kamu cuma melihat yang penting.</span></p>
+            <div class="ttags"><span class="ttag skill">verification-before-completion</span><span class="ttag cmd">/code-review</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">🚀</div>
+            <p class="tphase"><span class="lang-en">Stage 6 · Ship</span><span class="lang-id">Tahap 6 · Rilis</span></p>
+            <h4><span class="lang-en">Commit and push</span><span class="lang-id">Commit dan push</span></h4>
+            <p><span class="lang-en">One command commits with a sensible message, pushes, and can open a
+              pull request — no git commands to memorize.</span>
+              <span class="lang-id">Satu perintah untuk commit dengan pesan yang masuk akal, push, dan
+              bisa membuka pull request — tanpa perlu menghafal perintah git.</span></p>
+            <div class="ttags"><span class="ttag cmd">/commit-push-pr</span><span class="ttag skill">incremental-commits</span></div>
+          </div>
+
+          <div class="tnode loop">
+            <div class="tdot">↻</div>
+            <p class="tphase"><span class="lang-en">Repeat</span><span class="lang-id">Ulangi</span></p>
+            <h4><span class="lang-en">Back to Stage 1 for the next slice</span><span class="lang-id">Kembali ke Tahap 1 untuk potongan berikutnya</span></h4>
+            <p><span class="lang-en">Vibe coding is small loops, not one big leap. Ship a slice, react to
+              it, describe the next. For grindy tasks that need many passes, <code>/ralph-loop</code> runs
+              the cycle for you until it's done.</span>
+              <span class="lang-id">Vibe coding adalah loop-loop kecil, bukan satu lompatan besar. Rilis
+              satu potongan, tanggapi, jelaskan berikutnya. Untuk tugas berulang yang butuh banyak
+              putaran, <code>/ralph-loop</code> menjalankan siklusnya untukmu sampai selesai.</span></p>
+            <div class="ttags"><span class="ttag cmd">/ralph-loop</span></div>
+          </div>
+
+        </div><!-- /timeline -->
+
+        <div class="callout">
+          <span class="lang-en"><b>You don't have to drive each stage by hand.</b> Ask for the whole thing
+            — <em>"build me X"</em> — and <code>/feature-dev</code> chains explore → design → build →
+            review on its own. The stages above are just what's happening under the hood, and where you
+            can step in.</span>
+          <span class="lang-id"><b>Kamu tidak harus menjalankan tiap tahap secara manual.</b> Minta
+            keseluruhannya — <em>"buatkan X"</em> — dan <code>/feature-dev</code> merangkai telusuri →
+            desain → bangun → tinjau dengan sendirinya. Tahap-tahap di atas hanyalah apa yang terjadi di
+            balik layar, dan di mana kamu bisa ikut campur.</span>
+        </div>
+      </div><!-- /p-loop -->
+
+      <div class="panel" id="p-karimo">
+        <p class="panel-note">
+          <span class="lang-en"><b>For bigger, multi-step projects.</b> Instead of driving each feature
+            yourself, you hand KARIMO the whole thing — it plans the work into tasks, then runs a team of
+            agents to build them in parallel, each task on its own branch. You supervise; you don't type
+            every step.</span>
+          <span class="lang-id"><b>Untuk proyek besar yang bertahap-tahap.</b> Alih-alih menjalankan tiap
+            fitur sendiri, kamu menyerahkan keseluruhannya ke KARIMO — ia merencanakan pekerjaan menjadi
+            task, lalu menjalankan satu tim agen untuk membangunnya secara paralel, tiap task di
+            branch-nya sendiri. Kamu mengawasi; kamu tidak mengetik tiap langkah.</span></p>
+        <div class="timeline">
+
+          <div class="tnode">
+            <div class="tdot">📋</div>
+            <p class="tphase"><span class="lang-en">Stage 1 · Plan</span><span class="lang-id">Tahap 1 · Rencana</span></p>
+            <h4><span class="lang-en">Interview the project into a plan</span><span class="lang-id">Wawancarai proyek jadi rencana</span></h4>
+            <p><span class="lang-en">A structured interview turns your idea into a PRD — a requirements
+              document broken into concrete, ordered tasks the agents can execute.</span>
+              <span class="lang-id">Wawancara terstruktur mengubah idemu jadi PRD — dokumen kebutuhan yang
+              dipecah menjadi task konkret dan berurutan yang bisa dijalankan agen.</span></p>
+            <div class="ttags"><span class="ttag cmd">/karimo:plan</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">🔎</div>
+            <p class="tphase"><span class="lang-en">Stage 2 · Validate</span><span class="lang-id">Tahap 2 · Validasi</span></p>
+            <h4><span class="lang-en">Pre-flight the plan against your code</span><span class="lang-id">Uji rencana terhadap kodemu</span></h4>
+            <p><span class="lang-en">Reviewer agents check each task brief against your actual codebase
+              and flag gaps or conflicts <em>before</em> any code is written — cheap to fix now,
+              expensive later.</span>
+              <span class="lang-id">Agen peninjau memeriksa tiap brief task terhadap codebase asli kamu
+              dan menandai celah atau konflik <em>sebelum</em> kode ditulis — murah diperbaiki sekarang,
+              mahal nanti.</span></p>
+            <div class="ttags"><span class="ttag"><span class="lang-en">automatic · brief review</span><span class="lang-id">otomatis · tinjauan brief</span></span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">🤖</div>
+            <p class="tphase"><span class="lang-en">Stage 3 · Run</span><span class="lang-id">Tahap 3 · Jalankan</span></p>
+            <h4><span class="lang-en">Let the agent team build it</span><span class="lang-id">Biarkan tim agen membangunnya</span></h4>
+            <p><span class="lang-en">KARIMO executes the tasks autonomously in waves, spawning worker
+              agents. Each task lands on its own branch and pull request, so nothing steps on anything
+              else.</span>
+              <span class="lang-id">KARIMO menjalankan task secara otonom dalam gelombang, memunculkan
+              agen pekerja. Tiap task mendarat di branch dan pull request-nya sendiri, jadi tidak saling
+              mengganggu.</span></p>
+            <div class="ttags"><span class="ttag cmd">/karimo:run</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">📊</div>
+            <p class="tphase"><span class="lang-en">Stage 4 · Monitor</span><span class="lang-id">Tahap 4 · Pantau</span></p>
+            <h4><span class="lang-en">Watch it happen</span><span class="lang-id">Amati prosesnya</span></h4>
+            <p><span class="lang-en">A live dashboard shows which tasks are running, done, or blocked —
+              you supervise from one screen instead of chasing each agent.</span>
+              <span class="lang-id">Dashboard langsung menampilkan task mana yang berjalan, selesai, atau
+              tersendat — kamu mengawasi dari satu layar tanpa mengejar tiap agen.</span></p>
+            <div class="ttags"><span class="ttag cmd">/karimo:dashboard</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">🔀</div>
+            <p class="tphase"><span class="lang-en">Stage 5 · Merge</span><span class="lang-id">Tahap 5 · Gabung</span></p>
+            <h4><span class="lang-en">Integrate the finished work</span><span class="lang-id">Integrasikan hasil yang selesai</span></h4>
+            <p><span class="lang-en">Validates and merges the completed task PRs together, resolving
+              conflicts and checking coverage so the pieces land as one coherent feature.</span>
+              <span class="lang-id">Memvalidasi dan menggabungkan PR task yang selesai, menyelesaikan
+              konflik dan mengecek coverage supaya semua bagian menyatu jadi satu fitur yang utuh.</span></p>
+            <div class="ttags"><span class="ttag cmd">/karimo:merge</span></div>
+          </div>
+
+          <div class="tnode loop">
+            <div class="tdot">↻</div>
+            <p class="tphase"><span class="lang-en">Improve</span><span class="lang-id">Perbaiki</span></p>
+            <h4><span class="lang-en">Feed lessons into the next round</span><span class="lang-id">Bawa pelajaran ke putaran berikutnya</span></h4>
+            <p><span class="lang-en">Capture what should change and roll it into the next plan — the
+              orchestration gets sharper each cycle.</span>
+              <span class="lang-id">Rekam apa yang perlu diubah dan bawa ke rencana berikutnya —
+              orkestrasinya makin tajam tiap siklus.</span></p>
+            <div class="ttags"><span class="ttag cmd">/karimo:feedback</span></div>
+          </div>
+
+        </div>
+      </div><!-- /p-karimo -->
+
+      <div class="panel" id="p-hook">
+        <p class="panel-note">
+          <span class="lang-en"><b>When you want to <em>prevent</em> something.</b> Any time you catch
+            yourself giving the same correction twice — "don't touch that file," "always run tests
+            first," "stop using that library" — turn it into a permanent rule so it can't happen again.</span>
+          <span class="lang-id"><b>Saat kamu ingin <em>mencegah</em> sesuatu.</b> Setiap kali kamu sadar
+            memberi koreksi yang sama dua kali — "jangan sentuh file itu," "selalu jalankan tes dulu,"
+            "berhenti pakai library itu" — ubah jadi aturan permanen supaya tidak terulang.</span></p>
+        <div class="timeline">
+
+          <div class="tnode">
+            <div class="tdot">🚦</div>
+            <p class="tphase"><span class="lang-en">Stage 1 · Notice</span><span class="lang-id">Tahap 1 · Sadari</span></p>
+            <h4><span class="lang-en">Spot the thing you keep correcting</span><span class="lang-id">Kenali hal yang terus kamu koreksi</span></h4>
+            <p><span class="lang-en">The signal is repetition. If you've told the agent the same "don't
+              do that" more than once, it's a candidate for a guardrail.</span>
+              <span class="lang-id">Sinyalnya adalah pengulangan. Kalau kamu sudah menyampaikan "jangan
+              lakukan itu" yang sama lebih dari sekali, itu kandidat untuk pengaman.</span></p>
+            <div class="ttags"><span class="ttag"><span class="lang-en">you notice it</span><span class="lang-id">kamu yang sadar</span></span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">🪝</div>
+            <p class="tphase"><span class="lang-en">Stage 2 · Hookify</span><span class="lang-id">Tahap 2 · Hookify</span></p>
+            <h4><span class="lang-en">Turn it into an automatic rule</span><span class="lang-id">Ubah jadi aturan otomatis</span></h4>
+            <p><span class="lang-en">Describe what to avoid. Hookify studies the conversation pattern and
+              drafts a <b>hook</b> — a rule that blocks the behaviour before it happens, no config written
+              by hand.</span>
+              <span class="lang-id">Jelaskan apa yang harus dihindari. Hookify mempelajari pola percakapan
+              dan menyusun <b>hook</b> — aturan yang memblokir perilaku itu sebelum terjadi, tanpa menulis
+              config secara manual.</span></p>
+            <div class="ttags"><span class="ttag cmd">/hookify</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">⚙️</div>
+            <p class="tphase"><span class="lang-en">Stage 3 · Configure</span><span class="lang-id">Tahap 3 · Atur</span></p>
+            <h4><span class="lang-en">Tune when it fires</span><span class="lang-id">Setel kapan ia aktif</span></h4>
+            <p><span class="lang-en">Review the drafted rule and adjust it so it triggers exactly when you
+              want — no more, no less.</span>
+              <span class="lang-id">Tinjau aturan yang disusun dan sesuaikan supaya ia terpicu tepat saat
+              kamu inginkan — tidak lebih, tidak kurang.</span></p>
+            <div class="ttags"><span class="ttag cmd">/hookify:configure</span></div>
+          </div>
+
+          <div class="tnode">
+            <div class="tdot">✅</div>
+            <p class="tphase"><span class="lang-en">Stage 4 · Manage</span><span class="lang-id">Tahap 4 · Kelola</span></p>
+            <h4><span class="lang-en">Keep your guardrails tidy</span><span class="lang-id">Jaga pengamanmu tetap rapi</span></h4>
+            <p><span class="lang-en">See every rule you've set and adjust or remove any of them. The
+              correction now sticks permanently — you never have to give it again.</span>
+              <span class="lang-id">Lihat tiap aturan yang kamu buat, sesuaikan atau hapus salah satunya.
+              Koreksinya kini menempel permanen — kamu tak perlu menyampaikannya lagi.</span></p>
+            <div class="ttags"><span class="ttag cmd">/hookify:list</span></div>
+          </div>
+
+        </div>
+      </div><!-- /p-hook -->
+
+    </div><!-- /tabs -->
+  </div>
+</section>
+
+<!-- REQUIRED PLUGINS -->
+<section id="plugins">
+  <div class="wrap">
+    <h2><span class="num">04</span><span class="lang-en">Plugins</span><span class="lang-id">Plugin</span> <span class="badge b-req"><span class="lang-en">Required · 7</span><span class="lang-id">Wajib · 7</span></span></h2>
+    <p class="section-lede">
+      <span class="lang-en">Plugins add <b>slash commands</b> and <b>specialist sub-agents</b> to Claude
+        Code. Each card lists what the plugin does, how it plugs in, and the commands you'll type. Plugins
+        stay inert until installed from a marketplace.</span>
+      <span class="lang-id">Plugin menambahkan <b>slash command</b> dan <b>sub-agen spesialis</b> ke Claude
+        Code. Tiap kartu mencantumkan fungsi plugin, cara ia terhubung, dan perintah yang akan kamu ketik.
+        Plugin tetap tidak aktif sampai dipasang dari marketplace.</span>
+    </p>
+
+    <div class="cards">
+
+      <div class="card">
+        <h4>feature-dev</h4>
+        <p class="fn"><span class="lang-en">End-to-end feature development workflow</span><span class="lang-id">Alur kerja pengembangan fitur menyeluruh</span></p>
+        <p><span class="lang-en">The flagship "build me a feature" flow. It coordinates three specialist
+          agents so a change is explored, designed, then reviewed — not just dashed off.</span>
+          <span class="lang-id">Alur unggulan "buatkan saya fitur". Ia mengoordinasikan tiga agen
+          spesialis supaya sebuah perubahan ditelusuri, didesain, lalu ditinjau — bukan sekadar dikerjakan
+          asal jadi.</span></p>
+        <ul>
+          <li><b>code-explorer</b> — <span class="lang-en">traces how the existing feature works before touching it</span><span class="lang-id">menelusuri cara kerja fitur yang ada sebelum menyentuhnya</span></li>
+          <li><b>code-architect</b> — <span class="lang-en">designs the change against your codebase's real patterns</span><span class="lang-id">mendesain perubahan sesuai pola nyata codebase kamu</span></li>
+          <li><b>code-reviewer</b> — <span class="lang-en">checks the result for bugs and convention drift</span><span class="lang-id">memeriksa hasilnya dari bug dan penyimpangan konvensi</span></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>Use it for:</b> any non-trivial feature where you want the agent to understand first and implement second.</span><span class="lang-id"><b>Pakai untuk:</b> fitur apa pun yang tidak sepele, saat kamu ingin agen memahami dulu baru mengimplementasi.</span></div>
+        <div class="cmds"><code>/feature-dev</code></div>
+      </div>
+
+      <div class="card">
+        <h4>code-review</h4>
+        <p class="fn"><span class="lang-en">Automated PR review, confidence-scored</span><span class="lang-id">Review PR otomatis, berskor keyakinan</span></p>
+        <p><span class="lang-en">Runs several specialized review agents over a change and reports only the
+          findings it's confident matter — so you get signal, not a wall of nitpicks.</span>
+          <span class="lang-id">Menjalankan beberapa agen review khusus atas sebuah perubahan dan hanya
+          melaporkan temuan yang diyakini penting — jadi kamu dapat sinyal, bukan tumpukan cerewet.</span></p>
+        <ul>
+          <li><span class="lang-en">Multiple reviewers each look at a different axis of quality</span><span class="lang-id">Beberapa peninjau masing-masing melihat sisi kualitas yang berbeda</span></li>
+          <li><span class="lang-en">Confidence scoring filters low-value comments out</span><span class="lang-id">Skor keyakinan menyaring komentar bernilai rendah</span></li>
+          <li><span class="lang-en">Works on your local diff or a GitHub PR</span><span class="lang-id">Bekerja pada diff lokal kamu atau PR GitHub</span></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>Use it for:</b> a second pair of eyes before you merge.</span><span class="lang-id"><b>Pakai untuk:</b> mata kedua sebelum kamu merge.</span></div>
+        <div class="cmds"><code>/code-review</code></div>
+      </div>
+
+      <div class="card">
+        <h4>commit-commands</h4>
+        <p class="fn"><span class="lang-en">Streamlined git workflow</span><span class="lang-id">Alur kerja git yang disederhanakan</span></p>
+        <p><span class="lang-en">Turns the fiddly git dance into one word. The agent writes a sensible
+          commit message, pushes, and can open a pull request for you.</span>
+          <span class="lang-id">Mengubah ritual git yang ribet jadi satu kata. Agen menulis pesan commit
+          yang masuk akal, push, dan bisa membuka pull request untukmu.</span></p>
+        <ul>
+          <li><code>/commit</code> — <span class="lang-en">stage &amp; commit with a generated message</span><span class="lang-id">stage &amp; commit dengan pesan yang dibuatkan</span></li>
+          <li><code>/commit-push-pr</code> — <span class="lang-en">commit, push, and open a PR in one go</span><span class="lang-id">commit, push, dan buka PR sekaligus</span></li>
+          <li><code>/clean_gone</code> — <span class="lang-en">prune local branches whose remotes are gone</span><span class="lang-id">pangkas branch lokal yang remote-nya sudah hilang</span></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>Use it for:</b> saving your work without memorizing git commands.</span><span class="lang-id"><b>Pakai untuk:</b> menyimpan pekerjaanmu tanpa menghafal perintah git.</span></div>
+        <div class="cmds"><code>/commit</code><code>/commit-push-pr</code><code>/clean_gone</code></div>
+      </div>
+
+      <div class="card">
+        <h4>hookify</h4>
+        <p class="fn"><span class="lang-en">Turn "don't do that again" into a guardrail</span><span class="lang-id">Ubah "jangan ulangi itu" jadi pengaman</span></p>
+        <p><span class="lang-en">Notices patterns in your conversation and helps you create <b>hooks</b> —
+          automatic rules that stop unwanted behaviours before they happen, without you writing config by
+          hand.</span>
+          <span class="lang-id">Menyadari pola dalam percakapanmu dan membantu membuat <b>hook</b> —
+          aturan otomatis yang menghentikan perilaku tak diinginkan sebelum terjadi, tanpa kamu menulis
+          config secara manual.</span></p>
+        <ul>
+          <li><span class="lang-en">Analyzes what went wrong and proposes a rule to prevent it</span><span class="lang-id">Menganalisis apa yang salah dan mengusulkan aturan untuk mencegahnya</span></li>
+          <li><span class="lang-en">Manages the rules it creates</span><span class="lang-id">Mengelola aturan yang dibuatnya</span></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>Use it for:</b> making a one-time correction stick permanently.</span><span class="lang-id"><b>Pakai untuk:</b> membuat koreksi sekali jalan menempel permanen.</span></div>
+        <div class="cmds"><code>/hookify</code><code>/hookify:list</code><code>/hookify:configure</code></div>
+      </div>
+
+      <div class="card">
+        <h4>plugin-dev</h4>
+        <p class="fn"><span class="lang-en">Build your own plugins</span><span class="lang-id">Bangun plugin milikmu sendiri</span></p>
+        <p><span class="lang-en">The toolkit for extending Claude Code itself — scaffolds and validates new
+          plugins, commands, agents, and skills, with reviewer agents to check your work.</span>
+          <span class="lang-id">Perangkat untuk memperluas Claude Code itu sendiri — menyusun dan
+          memvalidasi plugin, perintah, agen, dan skill baru, dengan agen peninjau untuk memeriksa hasil
+          kerjamu.</span></p>
+        <ul>
+          <li><span class="lang-en">Create-plugin scaffolding from a guided flow</span><span class="lang-id">Penyusunan create-plugin lewat alur berpemandu</span></li>
+          <li><span class="lang-en">Validator and skill-reviewer agents</span><span class="lang-id">Agen validator dan skill-reviewer</span></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>Use it for:</b> when you outgrow the bundled tools and want your own.</span><span class="lang-id"><b>Pakai untuk:</b> saat kamu melampaui alat bawaan dan ingin bikin sendiri.</span></div>
+        <div class="cmds"><code>/plugin-dev:create-plugin</code></div>
+      </div>
+
+      <div class="card">
+        <h4>agent-sdk-dev</h4>
+        <p class="fn"><span class="lang-en">Build apps on the Claude Agent SDK</span><span class="lang-id">Bangun aplikasi di Claude Agent SDK</span></p>
+        <p><span class="lang-en">Scaffolds a new Agent SDK application and ships verifier agents that check
+          your app is configured correctly and follows SDK best practices — for both TypeScript and
+          Python.</span>
+          <span class="lang-id">Menyusun aplikasi Agent SDK baru dan menyertakan agen verifier yang
+          memeriksa aplikasimu terkonfigurasi benar dan mengikuti praktik terbaik SDK — untuk TypeScript
+          maupun Python.</span></p>
+        <ul>
+          <li><code>/new-sdk-app</code> — <span class="lang-en">scaffold a starter SDK app</span><span class="lang-id">susun aplikasi SDK awal</span></li>
+          <li><span class="lang-en">TS &amp; Python verifier agents for pre-deploy checks</span><span class="lang-id">Agen verifier TS &amp; Python untuk pengecekan pra-deploy</span></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>Use it for:</b> building your own AI agent as a product, not just in chat.</span><span class="lang-id"><b>Pakai untuk:</b> membangun agen AI-mu sendiri sebagai produk, bukan cuma di chat.</span></div>
+        <div class="cmds"><code>/new-sdk-app</code></div>
+      </div>
+
+      <div class="card">
+        <h4>karimo</h4>
+        <p class="fn"><span class="lang-en">Agent-orchestration suite</span><span class="lang-id">Paket orkestrasi agen</span></p>
+        <p><span class="lang-en">A larger workflow system (from the external <code>opensesh/KARIMO</code>
+          marketplace) for planning and running work across many agents: interview a plan, execute it in
+          waves, review, and merge — with a live dashboard.</span>
+          <span class="lang-id">Sistem alur kerja yang lebih besar (dari marketplace eksternal
+          <code>opensesh/KARIMO</code>) untuk merencanakan dan menjalankan pekerjaan lintas banyak agen:
+          wawancarai rencana, jalankan dalam gelombang, tinjau, dan gabungkan — dengan dashboard
+          langsung.</span></p>
+        <ul>
+          <li><code>/karimo:plan</code> — <span class="lang-en">interview requirements into a PRD</span><span class="lang-id">wawancarai kebutuhan jadi PRD</span></li>
+          <li><code>/karimo:run</code> — <span class="lang-en">execute tasks autonomously</span><span class="lang-id">jalankan task secara otonom</span></li>
+          <li><code>/karimo:merge</code> · <code>/karimo:dashboard</code> — <span class="lang-en">integrate &amp; monitor</span><span class="lang-id">integrasi &amp; pantau</span></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>Use it for:</b> bigger multi-step projects you want run methodically.</span><span class="lang-id"><b>Pakai untuk:</b> proyek besar bertahap yang ingin dijalankan secara metodis.</span></div>
+        <div class="cmds"><code>/karimo:plan</code><code>/karimo:run</code><code>/karimo:dashboard</code></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- OPTIONAL PLUGINS -->
+<section id="optional-plugins">
+  <div class="wrap">
+    <h2><span class="num">05</span><span class="lang-en">Optional plugins</span><span class="lang-id">Plugin opsional</span> <span class="badge b-opt"><span class="lang-en">Optional · 3</span><span class="lang-id">Opsional · 3</span></span></h2>
+    <p class="section-lede"><span class="lang-en">Nice-to-haves you can install if they fit how you work.</span><span class="lang-id">Tambahan opsional yang bisa kamu pasang kalau cocok dengan caramu bekerja.</span></p>
+
+    <div class="cards">
+
+      <div class="card">
+        <h4>ponytail <span class="badge b-inst"><span class="lang-en">Installed here</span><span class="lang-id">Terpasang di sini</span></span></h4>
+        <p class="fn"><span class="lang-en">The "lazy senior dev" — minimal solutions</span><span class="lang-id">Si "senior dev pemalas" — solusi minimal</span></p>
+        <p><span class="lang-en">Pushes the agent toward the smallest change that works: reuse before
+          writing, standard library before dependencies, delete before adding. Keeps generated code (and
+          token cost) lean.</span>
+          <span class="lang-id">Mendorong agen ke perubahan terkecil yang berhasil: pakai ulang sebelum
+          menulis, standard library sebelum dependency, hapus sebelum menambah. Menjaga kode (dan biaya
+          token) tetap ramping.</span></p>
+        <ul>
+          <li><span class="lang-en">Enforces a YAGNI / stdlib-first "ladder" on every change</span><span class="lang-id">Menerapkan "tangga" YAGNI / stdlib-dulu pada tiap perubahan</span></li>
+          <li><span class="lang-en">Levels:</span><span class="lang-id">Level:</span> <code>/ponytail lite|full|ultra</code></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>From:</b> <code>DietrichGebert/ponytail</code> · <b>Needs:</b> Node on PATH (for its activation hook)</span><span class="lang-id"><b>Dari:</b> <code>DietrichGebert/ponytail</code> · <b>Butuh:</b> Node di PATH (untuk hook aktivasinya)</span></div>
+        <div class="cmds"><code>/ponytail</code></div>
+      </div>
+
+      <div class="card">
+        <h4>pr-review-toolkit <span class="badge b-avail"><span class="lang-en">Available</span><span class="lang-id">Tersedia</span></span></h4>
+        <p class="fn"><span class="lang-en">Deep, specialized PR review</span><span class="lang-id">Review PR mendalam dan terspesialisasi</span></p>
+        <p><span class="lang-en">A panel of focused reviewers, each an expert in one thing — so nothing
+          falls between the cracks.</span>
+          <span class="lang-id">Sekelompok peninjau fokus, masing-masing ahli di satu hal — jadi tak ada
+          yang terlewat.</span></p>
+        <ul>
+          <li><span class="lang-en">Comments &amp; documentation quality</span><span class="lang-id">Kualitas komentar &amp; dokumentasi</span></li>
+          <li><span class="lang-en">Tests and coverage</span><span class="lang-id">Tes dan coverage</span></li>
+          <li><span class="lang-en">Error handling · type design · code simplification</span><span class="lang-id">Penanganan error · desain tipe · penyederhanaan kode</span></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>Use it for:</b> a more thorough review than the built-in <code>code-review</code> when the change is important.</span><span class="lang-id"><b>Pakai untuk:</b> review yang lebih menyeluruh dibanding <code>code-review</code> bawaan saat perubahannya penting.</span></div>
+        <div class="cmds"><code>/review-pr</code></div>
+      </div>
+
+      <div class="card">
+        <h4>ralph-wiggum <span class="badge b-avail"><span class="lang-en">Available</span><span class="lang-id">Tersedia</span></span></h4>
+        <p class="fn"><span class="lang-en">Run a prompt in a loop until done</span><span class="lang-id">Jalankan prompt dalam loop sampai selesai</span></p>
+        <p><span class="lang-en">Implements the "Ralph Wiggum technique" — run the same prompt on repeat,
+          letting the agent iterate toward completion of a task without you re-asking each round.</span>
+          <span class="lang-id">Menerapkan "teknik Ralph Wiggum" — jalankan prompt yang sama berulang,
+          membiarkan agen beriterasi sampai task selesai tanpa kamu memintanya lagi tiap putaran.</span></p>
+        <ul>
+          <li><code>/ralph-loop</code> — <span class="lang-en">start a continuous iterative loop</span><span class="lang-id">mulai loop iteratif berkelanjutan</span></li>
+          <li><code>/cancel-ralph</code> — <span class="lang-en">stop it</span><span class="lang-id">hentikan</span></li>
+        </ul>
+        <div class="kv"><span class="lang-en"><b>Use it for:</b> grindy tasks that need many passes to converge.</span><span class="lang-id"><b>Pakai untuk:</b> tugas berulang yang butuh banyak putaran untuk selesai.</span></div>
+        <div class="cmds"><code>/ralph-loop</code><code>/cancel-ralph</code></div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="wrap">
+    <h2><span class="num">06</span><span class="lang-en">Skills</span><span class="lang-id">Skill</span> <span class="badge b-req"><span class="lang-en">Auto-loading · 10</span><span class="lang-id">Auto-load · 10</span></span></h2>
+    <p class="section-lede">
+      <span class="lang-en">Skills are always-on know-how. Unlike plugins you invoke with a command, these
+        load automatically once the workspace is trusted and quietly shape how the agent works — no
+        install, nothing to type.</span>
+      <span class="lang-id">Skill adalah pengetahuan yang selalu aktif. Beda dari plugin yang kamu panggil
+        lewat perintah, skill ini termuat otomatis begitu workspace dipercaya dan diam-diam membentuk cara
+        agen bekerja — tanpa pemasangan, tanpa perlu mengetik apa pun.</span>
+    </p>
+
+    <div class="rows">
+      <div class="row"><span class="name">codebase-structure <span class="badge b-inst"><span class="lang-en">New</span><span class="lang-id">Baru</span></span></span>
+        <span class="desc"><span class="lang-en">The file-hygiene authority: reuse before creating, classify page vs component / global vs feature / frontend vs backend, place things correctly, promote on second use.</span><span class="lang-id">Otoritas kerapian file: pakai ulang sebelum membuat, klasifikasikan page vs component / global vs fitur / frontend vs backend, tempatkan dengan benar, naikkan saat dipakai kedua kali.</span></span></div>
+      <div class="row"><span class="name">brand-guidelines</span>
+        <span class="desc"><span class="lang-en">Applies your brand's voice and visual rules. Ships as a placeholder template until the setup interview fills in your actual brand.</span><span class="lang-id">Menerapkan suara dan aturan visual brand kamu. Datang sebagai template placeholder sampai wawancara setup mengisi brand kamu yang sebenarnya.</span></span></div>
+      <div class="row"><span class="name">frontend-design</span>
+        <span class="desc"><span class="lang-en">Guides production-quality UI: warm neutrals, subtle borders, layered shadows, purposeful motion, accessibility — and what to avoid (generic AI aesthetics).</span><span class="lang-id">Memandu UI kualitas produksi: warna netral hangat, border halus, bayangan berlapis, gerak yang bertujuan, aksesibilitas — dan apa yang harus dihindari (estetika AI yang generik).</span></span></div>
+      <div class="row"><span class="name">bos-code-quality</span>
+        <span class="desc"><span class="lang-en">Baseline code-quality standards the agent holds itself to.</span><span class="lang-id">Standar kualitas kode dasar yang dipegang agen.</span></span></div>
+      <div class="row"><span class="name">systematic-debugging</span>
+        <span class="desc"><span class="lang-en">A disciplined "understand the bug before fixing it" process — root cause over symptom patching.</span><span class="lang-id">Proses disiplin "pahami bug sebelum memperbaikinya" — akar masalah alih-alih menambal gejala.</span></span></div>
+      <div class="row"><span class="name">writing-plans</span>
+        <span class="desc"><span class="lang-en">Turns a spec into a clear, multi-step implementation plan before code is touched.</span><span class="lang-id">Mengubah spesifikasi jadi rencana implementasi bertahap yang jelas sebelum kode disentuh.</span></span></div>
+      <div class="row"><span class="name">subagent-driven-development</span>
+        <span class="desc"><span class="lang-en">Splits a plan into independent tasks and runs them via focused sub-agents.</span><span class="lang-id">Memecah rencana jadi task independen dan menjalankannya lewat sub-agen yang fokus.</span></span></div>
+      <div class="row"><span class="name">incremental-commits</span>
+        <span class="desc"><span class="lang-en">Encourages small, logical commits instead of one giant change.</span><span class="lang-id">Mendorong commit kecil yang logis alih-alih satu perubahan raksasa.</span></span></div>
+      <div class="row"><span class="name">security-guidance</span>
+        <span class="desc"><span class="lang-en">Flags security-sensitive patterns and steers toward safe defaults.</span><span class="lang-id">Menandai pola sensitif keamanan dan mengarahkan ke default yang aman.</span></span></div>
+      <div class="row"><span class="name">verification-before-completion</span>
+        <span class="desc"><span class="lang-en">Requires the agent to actually run checks and confirm output before claiming something is done.</span><span class="lang-id">Mewajibkan agen benar-benar menjalankan pengecekan dan memastikan hasil sebelum menyatakan sesuatu selesai.</span></span></div>
+    </div>
+  </div>
+</section>
+
+<!-- OUTPUT STYLES -->
+<section id="styles">
+  <div class="wrap">
+    <h2><span class="num">07</span><span class="lang-en">Output styles</span><span class="lang-id">Gaya output</span></h2>
+    <p class="section-lede">
+      <span class="lang-en">Output styles change <em>how the agent talks to you</em>. They're delivered like
+        skills — auto-loading, no marketplace install.</span>
+      <span class="lang-id">Gaya output mengubah <em>cara agen berbicara denganmu</em>. Dikirim seperti
+        skill — auto-load, tanpa pemasangan marketplace.</span>
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <h4>learning-output-style <span class="badge b-req"><span class="lang-en">Required</span><span class="lang-id">Wajib</span></span></h4>
+        <p><span class="lang-en">Explains as it goes, so you learn the "why" behind each change instead of
+          just receiving finished code. Good default while you're getting comfortable.</span>
+          <span class="lang-id">Menjelaskan sambil berjalan, jadi kamu belajar "kenapa" di balik tiap
+          perubahan alih-alih cuma menerima kode jadi. Default yang bagus selagi kamu membiasakan
+          diri.</span></p>
+      </div>
+      <div class="card">
+        <h4>explanatory-output-style <span class="badge b-opt"><span class="lang-en">Optional</span><span class="lang-id">Opsional</span></span></h4>
+        <p><span class="lang-en">An alternative, more narrative explanatory voice you can enable if you
+          prefer it.</span>
+          <span class="lang-id">Alternatif gaya penjelasan yang lebih naratif yang bisa kamu aktifkan
+          kalau lebih suka.</span></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TOKEN TOOLS -->
+<section id="tools">
+  <div class="wrap">
+    <h2><span class="num">08</span><span class="lang-en">Optional token-saving tools</span><span class="lang-id">Alat hemat token opsional</span></h2>
+    <p class="section-lede">
+      <span class="lang-en">These are external command-line tools, <b>not</b> Claude Code plugins. They cut
+        how many tokens the agent burns — handy on long sessions or large codebases. The setup runbook
+        offers each and installs only if you opt in.</span>
+      <span class="lang-id">Ini alat command-line eksternal, <b>bukan</b> plugin Claude Code. Keduanya
+        memangkas jumlah token yang dipakai agen — berguna untuk sesi panjang atau codebase besar. Runbook
+        setup menawarkan masing-masing dan memasang hanya kalau kamu setuju.</span>
+    </p>
+
+    <div class="cards">
+      <div class="card">
+        <h4>rtk <span class="badge b-avail"><span class="lang-en">Available</span><span class="lang-id">Tersedia</span></span></h4>
+        <p class="fn"><span class="lang-en">"Rust Token Killer" — compresses command output</span><span class="lang-id">"Rust Token Killer" — memampatkan output perintah</span></p>
+        <p><span class="lang-en">Sits between the agent and your tools (<code>ls</code>, <code>cat</code>,
+          <code>grep</code>, <code>git</code>, test runners) and trims their output before the model reads
+          it — <b>60–90% fewer tokens</b> from tool output, under 10 ms overhead.</span>
+          <span class="lang-id">Duduk di antara agen dan alat-alatmu (<code>ls</code>, <code>cat</code>,
+          <code>grep</code>, <code>git</code>, test runner) dan memangkas output-nya sebelum dibaca model —
+          <b>60–90% lebih sedikit token</b> dari output alat, overhead di bawah 10 ms.</span></p>
+        <div class="kv">
+          <span class="lang-en"><b>Integrates via:</b> a hook (<code>rtk hook claude</code>) ·
+            <b>Repo:</b> <code>rtk-ai/rtk</code><br>
+            <b>Heads-up:</b> install with <code>cargo install --git</code>, never plain
+            <code>cargo install rtk</code> (name collision with a different project).</span>
+          <span class="lang-id"><b>Terhubung lewat:</b> sebuah hook (<code>rtk hook claude</code>) ·
+            <b>Repo:</b> <code>rtk-ai/rtk</code><br>
+            <b>Perhatian:</b> pasang dengan <code>cargo install --git</code>, jangan
+            <code>cargo install rtk</code> biasa (bentrok nama dengan proyek lain).</span>
+        </div>
+      </div>
+      <div class="card">
+        <h4>graphify <span class="badge b-inst"><span class="lang-en">Installed here</span><span class="lang-id">Terpasang di sini</span></span></h4>
+        <p class="fn"><span class="lang-en">Maps your project into a knowledge graph</span><span class="lang-id">Memetakan proyekmu jadi knowledge graph</span></p>
+        <p><span class="lang-en">Builds a queryable map of your codebase (code parsed locally via AST;
+          docs/PDFs/images via the model). The agent can query, trace, and explain relationships instead
+          of grepping file by file — cutting exploration cost.</span>
+          <span class="lang-id">Membangun peta codebase yang bisa dikueri (kode diparse lokal via AST;
+          dokumen/PDF/gambar via model). Agen bisa mengueri, menelusuri, dan menjelaskan hubungan
+          alih-alih grep file satu per satu — memangkas biaya eksplorasi.</span></p>
+        <div class="kv">
+          <span class="lang-en"><b>Integrates via:</b> CLI + a registered skill (<code>/graphify</code>) ·
+            <b>Repo:</b> <code>Graphify-Labs/graphify</code><br>
+            <b>Run:</b> <code>/graphify .</code> → writes
+            <code>graphify-out/</code> (graph.html, report, json).</span>
+          <span class="lang-id"><b>Terhubung lewat:</b> CLI + skill terdaftar (<code>/graphify</code>) ·
+            <b>Repo:</b> <code>Graphify-Labs/graphify</code><br>
+            <b>Jalankan:</b> <code>/graphify .</code> → menulis
+            <code>graphify-out/</code> (graph.html, report, json).</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="lang-en"><b>Required vs optional, installed vs available:</b> badges throughout this page
+        mark what the template <em>requires</em> versus what's <em>optional</em>, and — for the two token
+        tools and the ponytail plugin — whether it's already installed on this machine or simply available
+        to add.</span>
+      <span class="lang-id"><b>Wajib vs opsional, terpasang vs tersedia:</b> badge di seluruh halaman ini
+        menandai apa yang <em>diwajibkan</em> template versus yang <em>opsional</em>, dan — untuk dua alat
+        token dan plugin ponytail — apakah sudah terpasang di mesin ini atau sekadar tersedia untuk
+        ditambahkan.</span>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span><span class="lang-en">Vibe Code Starter — agent development toolkit. Brand-neutral until you run setup.</span><span class="lang-id">Vibe Code Starter — perangkat pengembangan agen. Netral-merek sampai kamu menjalankan setup.</span></span>
+    <span><span class="lang-en">Inventory sourced from</span><span class="lang-id">Inventaris bersumber dari</span> <code>.claude/setup.config.json</code></span>
+  </div>
+</footer>
+
+<script>
+document.querySelectorAll('[data-set-lang]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var l=b.getAttribute('data-set-lang');
+    document.documentElement.setAttribute('data-lang',l);
+    document.documentElement.setAttribute('lang',l);
+    try{localStorage.setItem('lang',l);}catch(e){}
+  });
+});
+</script>
+
+</body>
+</html>

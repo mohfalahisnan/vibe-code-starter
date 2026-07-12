@@ -102,6 +102,7 @@
     "required": [
       "bos-code-quality",
       "brand-guidelines",
+      "codebase-structure",
       "frontend-design",
       "incremental-commits",
       "security-guidance",

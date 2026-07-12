@@ -33,8 +33,11 @@ and initializes these guide files.
 
 ## Conventions
 
-- <coding conventions the agent must follow>
-- <naming, structure, testing expectations>
+- **File/code hygiene**: the `codebase-structure` skill is authoritative — reuse before
+  creating, classify (page vs component, global vs feature-specific, frontend vs backend),
+  place correctly, promote on second use.
+- <other coding conventions the agent must follow>
+- <naming, testing expectations>
 
 ## Agent configuration
 
