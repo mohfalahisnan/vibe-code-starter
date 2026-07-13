@@ -33,7 +33,7 @@
   ],
 
   "plugins": {
-    "_note": "Plugins under .claude/plugins/ are INERT until installed from a marketplace. Install at user scope. Health check: `claude plugin list --json`.",
+    "_note": "For Claude Code, plugins under .claude/plugins/ are INERT until installed from a marketplace. Codex expands their components through the parity adapter. Claude health check: `claude plugin list --json`.",
     "required": [
       { "name": "agent-sdk-dev", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/agent-sdk-dev" },
       { "name": "code-review", "marketplace": "vibe-code-starter", "vendored": ".claude/plugins/code-review" },
@@ -86,7 +86,7 @@
   },
 
   "outputStyles": {
-    "_note": "Delivered as skills-dir plugins (they have .claude-plugin/plugin.json + hooks under .claude/skills/). They auto-load once the workspace is trusted and plugins are reloaded — no marketplace install required.",
+    "_note": "Claude delivers these as skills-dir plugins. Codex SessionStart reads the same canonical handlers through .codex/hooks/session_context.py.",
     "required": [
       { "name": "learning-output-style", "delivery": "skills-dir", "path": ".claude/skills/learning-output-style" }
     ],
@@ -96,7 +96,7 @@
   },
 
   "skills": {
-    "_note": "True SKILL.md skills under .claude/skills/ auto-load at project scope once the workspace is trusted. No install needed; verify presence + load.",
+    "_note": "Claude auto-loads true SKILL.md files under .claude/skills/. Codex loads generated wrappers under .agents/skills/; the parity checker prevents drift.",
     "path": ".claude/skills",
     "delivery": "project-auto-load",
     "required": [
@@ -111,6 +111,18 @@
       "verification-before-completion",
       "writing-plans"
     ]
+  },
+
+  "codex": {
+    "_note": "Codex adapters reference canonical .claude behavior. KARIMO is supplied by the machine's native Codex plugin and verified without storing an absolute path.",
+    "parityConfig": ".agents/parity.config.json",
+    "capabilityMap": ".agents/capability-map.json",
+    "skills": ".agents/skills",
+    "agents": ".codex/agents",
+    "hooks": ".codex/hooks.json",
+    "projectConfig": ".codex/config.toml",
+    "sync": "node scripts/sync-agent-adapters.mjs --write",
+    "healthCheck": "node scripts/sync-agent-adapters.mjs --check --machine"
   },
 
   "brand": {
@@ -138,7 +150,10 @@
     "agentsMd": "AGENTS.md",
     "configDoc": ".claude/README.md",
     "config": ".claude/setup.config.json",
-    "marketplaceManifest": ".claude-plugin/marketplace.json"
+    "marketplaceManifest": ".claude-plugin/marketplace.json",
+    "codexParityConfig": ".agents/parity.config.json",
+    "codexCapabilityMap": ".agents/capability-map.json",
+    "codexHooks": ".codex/hooks.json"
   },
 
   "state": {

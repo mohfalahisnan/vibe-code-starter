@@ -16,7 +16,8 @@ that file to change what the template installs; [`setup.md`](../setup.md) reads 
 | `marketplaces` | Plugin marketplaces to add (`vibe-code-starter` local + `karimo` GitHub) |
 | `plugins.required` / `plugins.optional` | Plugins to install, and from which marketplace |
 | `outputStyles` | Output-style plugins delivered as skills-dir plugins |
-| `skills` | Auto-loading `SKILL.md` skills that must be present |
+| `skills` | Canonical skills and required names for both harnesses |
+| `codex` | Paths and commands for generated Codex parity adapters |
 | `brand` | The user's brand identity (filled in during setup) |
 | `files` | Where the guide/config files live |
 | `state` | Idempotency flags updated as each setup phase completes |
@@ -48,8 +49,8 @@ offers each and installs only if you opt in.
 
 Live under `skills/` and load automatically once the workspace is trusted — no install.
 
-**Required:** `bos-code-quality` · `brand-guidelines` · `frontend-design` ·
-`incremental-commits` · `security-guidance` · `subagent-driven-development` ·
+**Required:** `bos-code-quality` · `brand-guidelines` · `codebase-structure` ·
+`frontend-design` · `incremental-commits` · `security-guidance` · `subagent-driven-development` ·
 `systematic-debugging` · `verification-before-completion` · `writing-plans`
 
 ### Output styles  → skills-dir plugins
@@ -57,6 +58,21 @@ Live under `skills/` and load automatically once the workspace is trusted — no
 `learning-output-style` (required) and `explanatory-output-style` (optional) live under
 `skills/` but are plugins (they have `.claude-plugin/plugin.json` + hooks). They auto-load
 with the other skills-dir entries after trust + `/reload-plugins`.
+
+### Codex parity  → generated project adapters
+
+`.claude/` remains the behavior source. Codex uses generated wrappers in
+`../.agents/skills/`, custom agents in `../.codex/agents/`, and native hook bridges in
+`../.codex/hooks.json`. The generated `../.agents/capability-map.json` lists every
+mapping. KARIMO is mapped to the machine's native `karimo@personal` plugin instead of
+copying the Claude KARIMO commands.
+
+After changing any canonical capability, run:
+
+```bash
+node scripts/sync-agent-adapters.mjs --write
+node scripts/sync-agent-adapters.mjs --check --machine
+```
 
 ### Brand identity
 
@@ -79,6 +95,9 @@ sets `brand.configured = true`.
 └── reference/           # Design-system reference
 
 ../.claude-plugin/marketplace.json   # Local marketplace manifest
+../.agents/                          # Codex parity config, map, generated skills
+../.codex/                           # Codex project config, custom agents, hook bridges
+../scripts/sync-agent-adapters.mjs   # Deterministic sync + drift checker
 ../setup.md                          # The setup runbook
 ../CLAUDE.md  ../AGENTS.md           # Agent guides (AGENTS.md → CLAUDE.md)
 ```

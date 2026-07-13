@@ -1,0 +1,6 @@
+# Python hook adapters and tests
+__pycache__/
+*.py[cod]
+
+# Shared Claude/Codex local hook state (Hookify and Ralph)
+.claude/*.local.md

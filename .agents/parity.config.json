@@ -1,0 +1,102 @@
+{
+  "schemaVersion": 1,
+  "canonicalRoot": ".claude",
+  "generatedBy": "scripts/sync-agent-adapters.mjs",
+  "nativeDependencies": [
+    {
+      "id": "karimo",
+      "plugin": "karimo",
+      "marketplace": "personal",
+      "minimumVersion": "9.11.0",
+      "required": true,
+      "sourceAdapters": [
+        {
+          "prefix": ".claude/commands/karimo/",
+          "targetPrefix": "karimo-workflow-"
+        },
+        {
+          "prefix": ".claude/skills/karimo/",
+          "targetPrefix": "karimo-standard-"
+        }
+      ],
+      "note": "Use the Codex-native KARIMO plugin installed on the machine. Never copy the Claude KARIMO commands into project adapters."
+    },
+    {
+      "id": "ponytail",
+      "plugin": "ponytail",
+      "marketplace": null,
+      "minimumVersion": null,
+      "required": false,
+      "sourceAdapters": [],
+      "note": "Optional external capability. It only has parity when the user opts in and a Codex-native plugin is installed."
+    }
+  ],
+  "nameOverrides": {
+    ".claude/plugins/hookify/commands/configure.md": "hookify-configure",
+    ".claude/plugins/hookify/commands/help.md": "hookify-help",
+    ".claude/plugins/hookify/commands/list.md": "hookify-list",
+    ".claude/plugins/ralph-wiggum/commands/help.md": "ralph-help"
+  },
+  "descriptionOverrides": {
+    ".claude/skills/bos-code-quality/SKILL.md": "Use when reviewing or editing project code to enforce the same BOS quality rules used by Claude Code.",
+    ".claude/skills/incremental-commits/SKILL.md": "Use when planning or making incremental Git commits with focused scope and verification between commits.",
+    ".claude/skills/subagent-driven-development/SKILL.md": "Use when an approved workflow explicitly calls for delegated implementation or review tasks with independent agents.",
+    ".claude/skills/systematic-debugging/SKILL.md": "Use when diagnosing a bug, failing test, regression, or unexpected behavior through evidence-first debugging.",
+    ".claude/skills/verification-before-completion/SKILL.md": "Use before claiming work is complete, fixed, passing, or ready; requires fresh verification evidence.",
+    ".claude/skills/writing-plans/SKILL.md": "Use when a task needs an implementation plan with concrete files, steps, tests, and completion checks.",
+    ".claude/skills/security-guidance/hooks/hooks.json": "Use when editing security-sensitive code; applies the same security reminders and blocking rules used by Claude Code.",
+    ".claude/skills/learning-output-style/README.md": "Use when the user requests learning output style with interactive contributions and educational implementation insights.",
+    ".claude/skills/explanatory-output-style/README.md": "Use when the user requests explanatory output style with concise educational implementation insights."
+  },
+  "specialInstructions": {
+    ".claude/plugins/ralph-wiggum/commands/ralph-loop.md": "Do not execute the Bash-only Claude setup script. From the repository root, run `python3 .codex/hooks/ralph_adapter.py start ...` on Unix, or `powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/run-python.ps1 .codex/hooks/ralph_adapter.py start ...` on Windows, followed by the user's prompt and options. Then work on that prompt. The adapter writes the same `.claude/ralph-loop.local.md` state used by Claude.",
+    ".claude/plugins/ralph-wiggum/commands/cancel-ralph.md": "From the repository root, run the portable Ralph adapter's `cancel` action (`python3 .codex/hooks/ralph_adapter.py cancel` on Unix or `powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/run-python.ps1 .codex/hooks/ralph_adapter.py cancel` on Windows); do not delete state with a platform-specific shell command.",
+    ".claude/skills/learning-output-style/README.md": "For the current task, read and apply the canonical SessionStart context in `.claude/skills/learning-output-style/hooks-handlers/session-start.sh`. New Codex sessions default to this mode; `CODEX_OUTPUT_STYLE=learning` selects it explicitly.",
+    ".claude/skills/explanatory-output-style/README.md": "For the current task, read and apply the canonical SessionStart context in `.claude/skills/explanatory-output-style/hooks-handlers/session-start.sh`. Set `CODEX_OUTPUT_STYLE=explanatory` before starting Codex to select it for a new session."
+  },
+  "syntheticSkills": [
+    {
+      "name": "security-guidance",
+      "source": ".claude/skills/security-guidance/hooks/hooks.json",
+      "origin": "hook-skill"
+    }
+  ],
+  "hookAdapters": [
+    {
+      "name": "hookify-hooks",
+      "source": ".claude/plugins/hookify/hooks/hooks.json",
+      "target": ".codex/hooks/hookify_adapter.py",
+      "events": ["PreToolUse", "PostToolUse", "Stop", "UserPromptSubmit"]
+    },
+    {
+      "name": "ralph-wiggum-stop",
+      "source": ".claude/plugins/ralph-wiggum/hooks/hooks.json",
+      "target": ".codex/hooks/ralph_adapter.py",
+      "events": ["Stop"]
+    },
+    {
+      "name": "security-guidance",
+      "source": ".claude/skills/security-guidance/hooks/hooks.json",
+      "target": ".codex/hooks/security_adapter.py",
+      "events": ["PreToolUse"]
+    },
+    {
+      "name": "learning-output-style",
+      "source": ".claude/skills/learning-output-style/hooks/hooks.json",
+      "target": ".codex/hooks/session_context.py",
+      "events": ["SessionStart"]
+    },
+    {
+      "name": "explanatory-output-style",
+      "source": ".claude/skills/explanatory-output-style/hooks/hooks.json",
+      "target": ".codex/hooks/session_context.py",
+      "events": ["SessionStart"]
+    }
+  ],
+  "requiredCodexFiles": [
+    ".agents/CODEX_COMPATIBILITY.md",
+    ".codex/config.toml",
+    ".codex/hooks.json",
+    ".codex/hooks/run-python.ps1"
+  ]
+}

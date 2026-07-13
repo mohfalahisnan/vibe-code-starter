@@ -1,0 +1,82 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/session_context.py",
+            "commandWindows": "powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/run-python.ps1 .codex/hooks/session_context.py",
+            "timeout": 10,
+            "statusMessage": "Loading shared output style"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/hookify_adapter.py pretooluse",
+            "commandWindows": "powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/run-python.ps1 .codex/hooks/hookify_adapter.py pretooluse",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "apply_patch",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/security_adapter.py",
+            "commandWindows": "powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/run-python.ps1 .codex/hooks/security_adapter.py",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/hookify_adapter.py posttooluse",
+            "commandWindows": "powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/run-python.ps1 .codex/hooks/hookify_adapter.py posttooluse",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/hookify_adapter.py stop",
+            "commandWindows": "powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/run-python.ps1 .codex/hooks/hookify_adapter.py stop",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/ralph_adapter.py stop",
+            "commandWindows": "powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/run-python.ps1 .codex/hooks/ralph_adapter.py stop",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 .codex/hooks/hookify_adapter.py userpromptsubmit",
+            "commandWindows": "powershell -NoProfile -ExecutionPolicy Bypass -File .codex/hooks/run-python.ps1 .codex/hooks/hookify_adapter.py userpromptsubmit",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

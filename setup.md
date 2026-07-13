@@ -4,8 +4,10 @@
 > starter template and asked you to set it up.** Follow this runbook top to bottom.
 > It is a *reference for setup*, not a description of an already-configured project.
 
-The single source of truth is **[`.claude/setup.config.json`](.claude/setup.config.json)**.
-Everything below reads from it. Human-readable docs for that config live in
+The desired capability set is declared in
+**[`.claude/setup.config.json`](.claude/setup.config.json)** and canonical behavior lives
+under `.claude/`. Codex platform mappings live in `.agents/parity.config.json`; the
+generated inventory is `.agents/capability-map.json`. Human-readable docs live in
 **[`.claude/README.md`](.claude/README.md)**.
 
 ---
@@ -40,17 +42,17 @@ each side-effecting step — not for command syntax.
    lists as authoritative. If this runbook and the config ever disagree, the config wins.
 4. **Report, don't assume.** After each phase, show the user what changed and what is
    still missing. Do not claim success without running the verification command.
-5. **Codex users:** you have no plugin marketplace. Do Phase 3–6 only, and read the
-   [Codex notes](#codex-notes) at the end.
+5. **Use the active harness path.** Claude Code installs the vendored marketplace
+   plugins. Codex uses generated project adapters plus Codex-native plugins such as
+   KARIMO. Read the [Codex notes](#codex-notes) before Phase 2.
 
 ---
 
 ## Phase 0 — Load config & detect environment
 
 1. Read `.claude/setup.config.json`.
-2. Detect the harness:
-   - **Claude Code** if the `claude` CLI is available (`claude --version`).
-   - **Codex** otherwise (or if the user says so).
+2. Detect the **active agent runtime** from the current session; CLI presence is only a
+   diagnostic because both CLIs may be installed. The user's explicit choice wins.
 3. Confirm the workspace is **trusted**. In Claude Code, project-scope skills and
    skills-dir plugins under `.claude/skills/` only load after the trust dialog is
    accepted. If untrusted, tell the user to accept trust, then continue.
@@ -77,16 +79,29 @@ claude plugin list --json
 For each `config.plugins.required[]` and `config.plugins.optional[]`, mark:
 `installed & enabled` / `installed but disabled` / `missing`.
 
+For Codex, use its own marketplace and parity checks instead:
+
+```bash
+codex plugin marketplace list
+codex plugin list
+node scripts/sync-agent-adapters.mjs --check --machine
+```
+
+The last command verifies every generated adapter and required native dependency,
+including `karimo@personal >= 9.11.0`, without storing its machine path in the repo.
+
 **Output styles** (skills-dir plugins) — they appear under
 "Skills-directory plugins" in `claude plugin list`. For each in
 `config.outputStyles`, mark loaded / not loaded.
 
-**Skills** — verify each `config.skills.required[]` directory exists and has a
-`SKILL.md`:
+**Skills** — on Claude, verify each `config.skills.required[]` directory exists and has
+a `SKILL.md`:
 ```bash
 ls .claude/skills
 ```
 Skills auto-load at project scope, so "present + workspace trusted" = healthy.
+On Codex, verify the matching generated skills under `.agents/skills/` through the
+parity check above.
 
 **Optional tools** (`config.optionalTools`) — external CLIs, check presence only:
 ```bash
@@ -102,6 +117,34 @@ Then move on.
 ## Phase 2 — Install marketplaces & plugins (needs approval)
 
 Only for items the health check flagged as missing. **Ask before each group.**
+
+### Codex path
+
+The vendored Claude plugins are already expanded into project-scoped Codex skills,
+agents, and hooks. Do not install or copy them into a Codex plugin cache. Run the sync
+writer after canonical source changes:
+
+```bash
+node scripts/sync-agent-adapters.mjs --write
+```
+
+KARIMO is the native-machine exception. If the health check says it is missing or old,
+ask approval, confirm the `personal` marketplace is configured, then install/upgrade
+the Codex version (not the Claude marketplace version):
+
+```bash
+codex plugin marketplace list
+codex plugin add karimo@personal
+node scripts/sync-agent-adapters.mjs --check --machine
+```
+
+Ponytail remains optional and only has cross-harness parity when the user opts in and a
+Codex-native Ponytail plugin is available. After Codex passes the machine check, continue
+with Phase 2e; skip Claude-only steps 2a–2d below.
+
+### Claude Code path
+
+Steps 2a–2d below apply only to Claude Code.
 
 ### 2a. Add marketplaces
 
@@ -198,13 +241,21 @@ failures. Record which the user accepted; note skipped ones in the final report.
 
 ## Phase 3 — Verify skills & output styles
 
-These are vendored under `.claude/skills/` and **auto-load** — no install, just trust + reload.
+For Claude Code:
 
 1. Confirm every `config.skills.required[]` dir exists with a `SKILL.md`.
-2. Confirm `config.outputStyles.required[]` (learning-output-style) and any opted-in
-   optional ones are present.
+2. Confirm `config.outputStyles.required[]` and opted-in optional styles are present.
 3. If the workspace was just trusted, have the user run `/reload-plugins`.
-4. Re-run `claude plugin list` and confirm the skills-dir plugins show as **loaded**.
+4. Re-run `claude plugin list` and confirm skills-dir plugins show as loaded.
+
+For Codex:
+
+1. Confirm the workspace is trusted so project config, hooks, and skills load.
+2. Run `node scripts/sync-agent-adapters.mjs --check --machine`.
+3. Confirm `.agents/skills/`, `.codex/agents/`, and `.codex/hooks.json` are present.
+4. Learning output style is the SessionStart default. Set
+   `CODEX_OUTPUT_STYLE=explanatory` before launch for the optional style, or `none` to
+   disable output-style context.
 
 Report which skills/output-styles are active. Do not proceed to brand setup until
 required skills are confirmed present.
@@ -254,11 +305,12 @@ Show a before/after of the key brand values and confirm with the user.
 
 ## Phase 6 — Final verification & report
 
-1. Re-run the Phase 1 health check.
-2. Confirm: all required plugins enabled, required skills + learning-output-style
+1. Re-run the Phase 1 health check for the active harness.
+2. Run `node scripts/sync-agent-adapters.mjs --check --machine` and confirm parity.
+3. Confirm: required plugins/adapters enabled, required skills + learning-output-style
    loaded, brand configured, `CLAUDE.md`/`AGENTS.md` filled in.
-3. Set `state.setupCompleted = true` in `.claude/setup.config.json`.
-4. Give the user a short **"what's installed / what's next"** summary, including any
+4. Set `state.setupCompleted = true` in `.claude/setup.config.json`.
+5. Give the user a short **"what's installed / what's next"** summary, including any
    optional plugins they skipped and how to add them later.
 
 Only claim setup is complete after the verification command output confirms it.
@@ -267,15 +319,20 @@ Only claim setup is complete after the verification command output confirms it.
 
 ## Codex notes
 
-Codex has **no plugin marketplace**. For Codex:
+Codex supports native plugins, project skills, custom agents, and hooks. This repo uses
+all four without changing Claude's working files:
 
-- **Skip Phase 2** (plugins). Codex reads `AGENTS.md` and discovers skills; it does not
-  install marketplace plugins.
-- **AGENTS.md** is Codex's entry point — it points to `CLAUDE.md`, which carries the
-  real project guidance. Keep both in sync via that pointer (never duplicate).
-- Do **Phases 3–6**: verify vendored skills, configure brand, initialize the guide files.
-- Plugin-only capabilities (feature-dev agents, karimo commands, hookify) are
-  Claude-Code-only. Note this to Codex users rather than pretending they installed.
+- `AGENTS.md` points to canonical `CLAUDE.md` guidance.
+- `.agents/skills/` wraps Claude skills and commands.
+- `.codex/agents/` maps vendored plugin agents with collision-safe names.
+- `.codex/hooks.json` bridges Hookify, security reminders, output style, and Ralph state.
+- KARIMO uses the installed Codex-native `karimo@personal` plugin. The Claude KARIMO
+  command/standard files are mapped to its native skills, never copied.
+- `.agents/capability-map.json` lists every mapping. Any new unmapped Claude capability
+  makes the parity check fail.
+
+Invocation syntax differs only at the surface: `/feature-dev` in Claude becomes
+`$feature-dev` in Codex. Workflow behavior and gates still come from the same source.
 
 ---
 
@@ -284,6 +341,11 @@ Codex has **no plugin marketplace**. For Codex:
 | Action | Command |
 | --- | --- |
 | List marketplaces | `claude plugin marketplace list` |
+| List Codex marketplaces | `codex plugin marketplace list` |
+| List Codex plugins | `codex plugin list` |
+| Install native Codex KARIMO | `codex plugin add karimo@personal` |
+| Sync Codex adapters | `node scripts/sync-agent-adapters.mjs --write` |
+| Check Claude/Codex parity | `node scripts/sync-agent-adapters.mjs --check --machine` |
 | Add local marketplace | `claude plugin marketplace add .` |
 | Add KARIMO marketplace | `claude plugin marketplace add opensesh/KARIMO` |
 | Add ponytail marketplace | `claude plugin marketplace add DietrichGebert/ponytail` |

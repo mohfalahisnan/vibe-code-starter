@@ -51,15 +51,22 @@ This repo ships a curated `.claude/` config. See:
 | `.claude/skills/` | Auto-loading skills (incl. `brand-guidelines`) |
 | `.claude/plugins/` | Vendored plugins (install via the local marketplace) |
 | `.claude/brand/` | Brand identity & writing guides |
+| [`.agents/capability-map.json`](.agents/capability-map.json) | Generated Claude → Codex capability mapping |
+| `.agents/skills/` | Generated Codex skill/command adapters |
+| `.codex/agents/` · [`.codex/hooks.json`](.codex/hooks.json) | Codex agent and hook adapters |
 
 ### Installed capabilities (after setup)
 
 - **Plugins**: agent-sdk-dev, code-review, commit-commands, feature-dev, hookify,
   plugin-dev, karimo (+ optional: ralph-wiggum, pr-review-toolkit)
-- **Skills**: bos-code-quality, brand-guidelines, frontend-design, incremental-commits,
-  security-guidance, subagent-driven-development, systematic-debugging,
+- **Skills**: bos-code-quality, brand-guidelines, codebase-structure, frontend-design,
+  incremental-commits, security-guidance, subagent-driven-development, systematic-debugging,
   verification-before-completion, writing-plans
 - **Output styles**: learning-output-style (+ optional: explanatory-output-style)
+
+Claude Code invokes commands with `/name`; Codex invokes the mapped project skill with
+`$name`. Both read the same canonical source under `.claude/`. Codex KARIMO comes from
+the native machine plugin and is never copied from the Claude command files.
 
 ## Validation
 
@@ -68,6 +75,7 @@ Before claiming a task is done, run the project's checks and confirm the output:
 ```bash
 <npm run build>
 <npm run lint>
+node scripts/sync-agent-adapters.mjs --check --machine
 ```
 
 ## Instruction precedence
@@ -76,5 +84,5 @@ When instructions conflict, follow this order (highest first):
 
 1. Direct user instructions in chat
 2. This file (`CLAUDE.md`)
-3. Global `~/.claude/CLAUDE.md`
+3. Harness-level user guidance (`~/.claude/CLAUDE.md` or `~/.codex/AGENTS.md`)
 4. Skills (auto-activated, supplement the above)

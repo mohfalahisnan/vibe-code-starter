@@ -8,11 +8,22 @@ same guide, without duplicating content.
 
 If the template hasn't been bootstrapped yet, follow **[`setup.md`](setup.md)**.
 
-## Codex specifics
+## Shared Claude/Codex behavior
 
-Codex has no plugin marketplace. Codex uses the vendored **skills** under
-`.claude/skills/` and this guidance — not the Claude Code plugins. See the
-[Codex notes](setup.md#codex-notes) in the setup runbook for which capabilities apply.
+`.claude/` is the canonical behavior source. Codex loads generated project adapters
+from `.agents/skills/`, `.codex/agents/`, and `.codex/hooks.json`; do not maintain a
+second copy of the workflows by hand.
+
+After changing any Claude skill, command, agent, hook, or vendored plugin, run:
+
+```bash
+node scripts/sync-agent-adapters.mjs --write
+node scripts/sync-agent-adapters.mjs --check --machine
+```
+
+KARIMO is not copied from `.claude/commands/karimo/`. Codex uses the machine's native
+`karimo` plugin, whose presence and version are checked by the parity script. Full
+mapping lives in [`.agents/capability-map.json`](.agents/capability-map.json).
 
 ---
 
