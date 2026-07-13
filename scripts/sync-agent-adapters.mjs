@@ -25,6 +25,14 @@ function normalize(value) {
   return value.split(path.sep).join("/");
 }
 
+function normalizeEol(value) {
+  return value.replace(/\r\n/g, "\n");
+}
+
+function sameText(left, right) {
+  return left !== null && normalizeEol(left) === normalizeEol(right);
+}
+
 function absolute(relativePath) {
   return path.join(repoRoot, ...relativePath.split("/"));
 }
@@ -434,7 +442,7 @@ function writeFile(relativePath, content) {
   const target = absolute(relativePath);
   fs.mkdirSync(path.dirname(target), { recursive: true });
   const current = fs.existsSync(target) ? fs.readFileSync(target, "utf8") : null;
-  if (current !== content) {
+  if (!sameText(current, content)) {
     fs.writeFileSync(target, content, "utf8");
     console.log(`updated ${relativePath}`);
   }
@@ -449,14 +457,14 @@ if (writeMode && checkErrors.length === 0) {
 
 if (checkMode) {
   const currentMap = fs.existsSync(capabilityMapPath) ? fs.readFileSync(capabilityMapPath, "utf8") : null;
-  if (currentMap !== expectedMapContent) {
+  if (!sameText(currentMap, expectedMapContent)) {
     checkErrors.push("Capability map is stale; run node scripts/sync-agent-adapters.mjs --write");
   }
 
   for (const [target, content] of expectedGeneratedFiles) {
     if (!fs.existsSync(absolute(target))) {
       checkErrors.push(`Generated adapter missing: ${target}`);
-    } else if (fs.readFileSync(absolute(target), "utf8") !== content) {
+    } else if (!sameText(fs.readFileSync(absolute(target), "utf8"), content)) {
       checkErrors.push(`Generated adapter is stale or hand-edited: ${target}`);
     }
   }
